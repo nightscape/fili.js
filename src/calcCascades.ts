@@ -1,7 +1,6 @@
 'use strict';
-// @ts-expect-error ts-migrate(2580) FIXME: Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-var IirCoeffs = require('./iirCoeffs');
-// @ts-expect-error ts-migrate(7009) FIXME: 'new' expression, whose target lacks a construct s... Remove this comment to see the full error message
+import IirCoeffs from './iirCoeffs'
+
 var getCoeffs = new IirCoeffs();
 var table = {
     // values from https://gist.github.com/endolith/4982787#file-all-values-txt
@@ -236,7 +235,7 @@ var initCalcCoeffs = function (behavior: any) {
         return calcCoeffs(params, behavior);
     };
 };
-// @ts-expect-error ts-migrate(2403) FIXME: Subsequent variable declarations must have the sam... Remove this comment to see the full error message
+
 var self = {};
 var CalcCascades = function () {
     var available: any = [];
