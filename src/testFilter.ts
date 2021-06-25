@@ -3,19 +3,19 @@
 /**
  * Test filter
  */
-var TestFilter = function (filter) {
+var TestFilter = function (filter: any) {
   var f = filter
 
-  var simData = []
+  var simData: any = []
   var cnt
 
-  var randomValues = function (params) {
+  var randomValues = function (params: any) {
     for (cnt = 0; cnt < params.steps; cnt++) {
       simData.push(f.singleStep(((Math.random() - 0.5) * params.pp) + params.offset))
     }
   }
 
-  var stepValues = function (params) {
+  var stepValues = function (params: any) {
     var max = params.offset + params.pp
     var min = params.offset - params.pp
     for (cnt = 0; cnt < params.steps; cnt++) {
@@ -27,7 +27,7 @@ var TestFilter = function (filter) {
     }
   }
 
-  var impulseValues = function (params) {
+  var impulseValues = function (params: any) {
     var max = params.offset + params.pp
     var min = params.offset - params.pp
     for (cnt = 0; cnt < params.steps; cnt++) {
@@ -39,7 +39,7 @@ var TestFilter = function (filter) {
     }
   }
 
-  var rampValues = function (params) {
+  var rampValues = function (params: any) {
     var max = params.offset + params.pp
     var min = params.offset - params.pp
     var val = min
@@ -55,7 +55,7 @@ var TestFilter = function (filter) {
   }
 
   var self = {
-    randomStability: function (params) {
+    randomStability: function (params: any) {
       f.reinit()
       simData.length = 0
       randomValues(params)
@@ -66,7 +66,7 @@ var TestFilter = function (filter) {
       }
       return true
     },
-    directedRandomStability: function (params) {
+    directedRandomStability: function (params: any) {
       f.reinit()
       simData.length = 0
       var i
@@ -97,4 +97,5 @@ var TestFilter = function (filter) {
   return self
 }
 
+// @ts-expect-error ts-migrate(2580) FIXME: Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
 module.exports = TestFilter

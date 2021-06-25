@@ -3,7 +3,8 @@
 /**
  * Evaluate phase
  */
-exports.evaluatePhase = function (res) {
+// @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'exports'.
+exports.evaluatePhase = function (res: any) {
   var xcnt = 0
   var cnt = 0
   var pi = Math.PI
@@ -52,7 +53,8 @@ exports.evaluatePhase = function (res) {
 /**
  * Run multi filter
  */
-exports.runMultiFilter = function (input, d, doStep, overwrite) {
+// @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'exports'.
+exports.runMultiFilter = function (input: any, d: any, doStep: any, overwrite: any) {
   var out = []
   if (overwrite) {
     out = input
@@ -64,7 +66,8 @@ exports.runMultiFilter = function (input, d, doStep, overwrite) {
   return out
 }
 
-exports.runMultiFilterReverse = function (input, d, doStep, overwrite) {
+// @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'exports'.
+exports.runMultiFilterReverse = function (input: any, d: any, doStep: any, overwrite: any) {
   var out = []
   if (overwrite) {
     out = input
@@ -76,7 +79,8 @@ exports.runMultiFilterReverse = function (input, d, doStep, overwrite) {
   return out
 }
 
-var factorial = function (n, a) {
+// @ts-expect-error ts-migrate(7023) FIXME: 'factorial' implicitly has return type 'any' becau... Remove this comment to see the full error message
+var factorial = function (n: any, a: any) {
   if (!a) {
     a = 1
   }
@@ -93,17 +97,20 @@ var factorial = function (n, a) {
 /**
  * Bessel factors
  */
-exports.besselFactors = function (n) {
+// @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'exports'.
+exports.besselFactors = function (n: any) {
   var res = []
   for (var k = 0; k < n + 1; k++) {
+    // @ts-expect-error ts-migrate(2554) FIXME: Expected 2 arguments, but got 1.
     var p = factorial(2 * n - k)
+    // @ts-expect-error ts-migrate(2554) FIXME: Expected 2 arguments, but got 1.
     var q = Math.pow(2, (n - k)) * factorial(k) * factorial(n - k)
     res.unshift(Math.floor(p / q))
   }
   return res
 }
 
-var fractionToFp = function (fraction, fractionBits) {
+var fractionToFp = function (fraction: any, fractionBits: any) {
   var fpFraction = 0
   for (var cnt = 0; cnt < fractionBits; cnt++) {
     var bitVal = 1 / Math.pow(2, cnt + 1)
@@ -115,11 +122,11 @@ var fractionToFp = function (fraction, fractionBits) {
   return fpFraction
 }
 
-var numberToFp = function (number, numberBits) {
+var numberToFp = function (number: any, numberBits: any) {
   return number & Math.pow(2, numberBits)
 }
 
-var valueToFp = function (value, numberBits, fractionBits) {
+var valueToFp = function (value: any, numberBits: any, fractionBits: any) {
   var number = Math.abs(value)
   var fraction = value - number
   var fpNumber = {
@@ -131,26 +138,28 @@ var valueToFp = function (value, numberBits, fractionBits) {
   return fpNumber
 }
 
+// @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'exports'.
 exports.fixedPoint = {
-  convert: function (value, numberBits, fractionBits) {
+  convert: function (value: any, numberBits: any, fractionBits: any) {
     return valueToFp(value, numberBits, fractionBits)
   },
-  add: function (fpVal1, fpVal2) {
+  add: function (fpVal1: any, fpVal2: any) {
   },
-  sub: function (fpVal1, fpVal2) {
+  sub: function (fpVal1: any, fpVal2: any) {
   },
-  mul: function (fpVal1, fpVal2) {
+  mul: function (fpVal1: any, fpVal2: any) {
   },
-  div: function (fpVal1, fpVal2) {
+  div: function (fpVal1: any, fpVal2: any) {
   }
 }
 
 /**
  * Complex
  */
+// @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'exports'.
 exports.complex = {
 
-  div: function (p, q) {
+  div: function (p: any, q: any) {
     var a = p.re
     var b = p.im
     var c = q.re
@@ -162,7 +171,7 @@ exports.complex = {
     }
     return x
   },
-  mul: function (p, q) {
+  mul: function (p: any, q: any) {
     var a = p.re
     var b = p.im
     var c = q.re
@@ -173,24 +182,24 @@ exports.complex = {
     }
     return x
   },
-  add: function (p, q) {
+  add: function (p: any, q: any) {
     var x = {
       re: p.re + q.re,
       im: p.im + q.im
     }
     return x
   },
-  sub: function (p, q) {
+  sub: function (p: any, q: any) {
     var x = {
       re: p.re - q.re,
       im: p.im - q.im
     }
     return x
   },
-  phase: function (n) {
+  phase: function (n: any) {
     return Math.atan2(n.im, n.re)
   },
-  magnitude: function (n) {
+  magnitude: function (n: any) {
     return Math.sqrt(n.re * n.re + n.im * n.im)
   }
 }

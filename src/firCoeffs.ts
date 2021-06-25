@@ -4,13 +4,13 @@ var FirCoeffs = function () {
   // Kaiser windowd filters
   // desired attenuation can be defined
   // better than windowd sinc filters
-  var calcKImpulseResponse = function (params) {
+  var calcKImpulseResponse = function (params: any) {
     var Fs = params.Fs
     var Fa = params.Fa
     var Fb = params.Fb
     var o = params.order || 51
     var alpha = params.Att || 100
-    var ino = function (val) {
+    var ino = function (val: any) {
       var d = 0
       var ds = 1
       var s = 1
@@ -57,7 +57,7 @@ var FirCoeffs = function () {
 
   // note: coefficients are equal to impulse response
   // windowd sinc filter
-  var calcImpulseResponse = function (params) {
+  var calcImpulseResponse = function (params: any) {
     var Fs = params.Fs
     var Fc = params.Fc
     var o = params.order
@@ -85,7 +85,7 @@ var FirCoeffs = function () {
     return ret
   }
   // invert for highpass from lowpass
-  var invert = function (h) {
+  var invert = function (h: any) {
     var cnt
     for (cnt = 0; cnt < h.length; cnt++) {
       h[cnt] = -h[cnt]
@@ -93,7 +93,7 @@ var FirCoeffs = function () {
     h[(h.length - 1) / 2]++
     return h
   }
-  var bs = function (params) {
+  var bs = function (params: any) {
     var lp = calcImpulseResponse({
       order: params.order,
       Fs: params.Fs,
@@ -111,19 +111,19 @@ var FirCoeffs = function () {
     return out
   }
   var self = {
-    lowpass: function (params) {
+    lowpass: function (params: any) {
       return calcImpulseResponse(params)
     },
-    highpass: function (params) {
+    highpass: function (params: any) {
       return invert(calcImpulseResponse(params))
     },
-    bandstop: function (params) {
+    bandstop: function (params: any) {
       return bs(params)
     },
-    bandpass: function (params) {
+    bandpass: function (params: any) {
       return invert(bs(params))
     },
-    kbFilter: function (params) {
+    kbFilter: function (params: any) {
       return calcKImpulseResponse(params)
     },
     available: function () {
@@ -133,4 +133,5 @@ var FirCoeffs = function () {
   return self
 }
 
+// @ts-expect-error ts-migrate(2580) FIXME: Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
 module.exports = FirCoeffs
