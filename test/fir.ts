@@ -7,7 +7,7 @@ import FirFilter from '../src/firFilter'
 
 
 describe('iir.js', function () {
-  var firCalculator: any
+  let firCalculator: any
 
 
   before(function () {
@@ -20,7 +20,7 @@ describe('iir.js', function () {
 
 
   describe('fir-lp', function () {
-    var filterCoeffs: any, filter: any
+    let filterCoeffs: any, filter: any
 
     it('can calculate coeffs', function () {
       filterCoeffs = firCalculator.lowpass({
@@ -42,18 +42,18 @@ describe('iir.js', function () {
 
 
     it('can do a single step', function () {
-      var out = filter.singleStep(10)
+      let out = filter.singleStep(10)
       out.should.be.a.Number
       out.should.not.equal(0)
     })
 
 
     it('can do multiple steps', function () {
-      var simInput = []
-      for (var i = 0; i < 10000; i++) {
+      let simInput = []
+      for (let i = 0; i < 10000; i++) {
         simInput.push(i % 10 - 5)
       }
-      var out = filter.multiStep(simInput)
+      let out = filter.multiStep(simInput)
       out.should.be.an.Array
       out.length.should.equal(10000)
       out[111].should.not.equal(simInput[111])
@@ -61,11 +61,11 @@ describe('iir.js', function () {
 
 
     it('can simulate multiple steps', function () {
-      var simInput = []
-      for (var i = 0; i < 10000; i++) {
+      let simInput = []
+      for (let i = 0; i < 10000; i++) {
         simInput.push(i % 10 - 5)
       }
-      var out = filter.simulate(simInput)
+      let out = filter.simulate(simInput)
       out.should.be.an.Array
       out.length.should.equal(10000)
       out[111].should.not.equal(simInput[111])
@@ -73,7 +73,7 @@ describe('iir.js', function () {
 
 
     it('calculates filter response', function () {
-      var r = filter.response(200)
+      let r = filter.response(200)
       r.should.be.an.Array
       r.length.should.equal(200)
       r[20].should.be.an.Object
@@ -100,7 +100,7 @@ describe('iir.js', function () {
 
 
   describe('fir-hp', function () {
-    var filterCoeffs: any, filter: any
+    let filterCoeffs: any, filter: any
 
     it('can calculate coeffs', function () {
       filterCoeffs = firCalculator.highpass({
@@ -122,18 +122,18 @@ describe('iir.js', function () {
 
 
     it('can do a single step', function () {
-      var out = filter.singleStep(10)
+      let out = filter.singleStep(10)
       out.should.be.a.Number
       out.should.not.equal(0)
     })
 
 
     it('can do multiple steps', function () {
-      var simInput = []
-      for (var i = 0; i < 10000; i++) {
+      let simInput = []
+      for (let i = 0; i < 10000; i++) {
         simInput.push(i % 10 - 5)
       }
-      var out = filter.multiStep(simInput)
+      let out = filter.multiStep(simInput)
       out.should.be.an.Array
       out.length.should.equal(10000)
       out[111].should.not.equal(simInput[111])
@@ -141,11 +141,11 @@ describe('iir.js', function () {
 
 
     it('can simulate multiple steps', function () {
-      var simInput = []
-      for (var i = 0; i < 10000; i++) {
+      let simInput = []
+      for (let i = 0; i < 10000; i++) {
         simInput.push(i % 10 - 5)
       }
-      var out = filter.simulate(simInput)
+      let out = filter.simulate(simInput)
       out.should.be.an.Array
       out.length.should.equal(10000)
       out[111].should.not.equal(simInput[111])
@@ -153,7 +153,7 @@ describe('iir.js', function () {
 
 
     it('calculates filter response', function () {
-      var r = filter.response(200)
+      let r = filter.response(200)
       r.should.be.an.Array
       r.length.should.equal(200)
       r[20].should.be.an.Object
@@ -180,7 +180,7 @@ describe('iir.js', function () {
 
 
   describe('fir-br', () => {
-    var filterCoeffs: any, filter: any
+    let filterCoeffs: any, filter: any
 
     it('can calculate coeffs', function () {
       filterCoeffs = firCalculator.bandstop({
@@ -203,18 +203,18 @@ describe('iir.js', function () {
 
 
     it('can do a single step', function () {
-      var out = filter.singleStep(10)
+      let out = filter.singleStep(10)
       out.should.be.a.Number
       out.should.not.equal(0)
     })
 
 
     it('can do multiple steps', function () {
-      var simInput = []
-      for (var i = 0; i < 10000; i++) {
+      let simInput = []
+      for (let i = 0; i < 10000; i++) {
         simInput.push(i % 10 - 5)
       }
-      var out = filter.multiStep(simInput)
+      let out = filter.multiStep(simInput)
       out.should.be.an.Array
       out.length.should.equal(10000)
       out[111].should.not.equal(simInput[111])
@@ -222,11 +222,11 @@ describe('iir.js', function () {
 
 
     it('can simulate multiple steps', function () {
-      var simInput = []
-      for (var i = 0; i < 10000; i++) {
+      let simInput = []
+      for (let i = 0; i < 10000; i++) {
         simInput.push(i % 10 - 5)
       }
-      var out = filter.simulate(simInput)
+      let out = filter.simulate(simInput)
       out.should.be.an.Array
       out.length.should.equal(10000)
       out[111].should.not.equal(simInput[111])
@@ -234,7 +234,7 @@ describe('iir.js', function () {
 
 
     it('calculates filter response', function () {
-      var r = filter.response(200)
+      let r = filter.response(200)
       r.should.be.an.Array
       r.length.should.equal(200)
       r[20].should.be.an.Object
@@ -261,7 +261,7 @@ describe('iir.js', function () {
 
 
   describe('fir-bp', function () {
-    var filterCoeffs: any, filter: any
+    let filterCoeffs: any, filter: any
 
     it('can calculate coeffs', function () {
       filterCoeffs = firCalculator.bandpass({
@@ -284,18 +284,18 @@ describe('iir.js', function () {
 
 
     it('can do a single step', function () {
-      var out = filter.singleStep(10)
+      let out = filter.singleStep(10)
       out.should.be.a.Number
       out.should.not.equal(0)
     })
 
 
     it('can do multiple steps', function () {
-      var simInput = []
-      for (var i = 0; i < 10000; i++) {
+      let simInput = []
+      for (let i = 0; i < 10000; i++) {
         simInput.push(i % 10 - 5)
       }
-      var out = filter.multiStep(simInput)
+      let out = filter.multiStep(simInput)
       out.should.be.an.Array
       out.length.should.equal(10000)
       out[111].should.not.equal(simInput[111])
@@ -303,11 +303,11 @@ describe('iir.js', function () {
 
 
     it('can simulate multiple steps', function () {
-      var simInput = []
-      for (var i = 0; i < 10000; i++) {
+      let simInput = []
+      for (let i = 0; i < 10000; i++) {
         simInput.push(i % 10 - 5)
       }
-      var out = filter.simulate(simInput)
+      let out = filter.simulate(simInput)
       out.should.be.an.Array
       out.length.should.equal(10000)
       out[111].should.not.equal(simInput[111])
@@ -315,7 +315,7 @@ describe('iir.js', function () {
 
 
     it('calculates filter response', function () {
-      var r = filter.response(200)
+      let r = filter.response(200)
       r.should.be.an.Array
       r.length.should.equal(200)
       r[20].should.be.an.Object
@@ -336,7 +336,7 @@ describe('iir.js', function () {
 
 
     describe('fir-kb-bp', function () {
-      var filterCoeffs: any, filter: any
+      let filterCoeffs: any, filter: any
 
       it('can calculate coeffs', function () {
         filterCoeffs = firCalculator.kbFilter({
@@ -360,18 +360,18 @@ describe('iir.js', function () {
 
 
       it('can do a single step', function () {
-        var out = filter.singleStep(10)
+        let out = filter.singleStep(10)
         out.should.be.a.Number
         out.should.not.equal(0)
       })
 
 
       it('can do multiple steps', function () {
-        var simInput = []
-        for (var i = 0; i < 10000; i++) {
+        let simInput = []
+        for (let i = 0; i < 10000; i++) {
           simInput.push(i % 10 - 5)
         }
-        var out = filter.multiStep(simInput)
+        let out = filter.multiStep(simInput)
         out.should.be.an.Array
         out.length.should.equal(10000)
         out[111].should.not.equal(simInput[111])
@@ -379,11 +379,11 @@ describe('iir.js', function () {
 
 
       it('can simulate multiple steps', function () {
-        var simInput = []
-        for (var i = 0; i < 10000; i++) {
+        let simInput = []
+        for (let i = 0; i < 10000; i++) {
           simInput.push(i % 10 - 5)
         }
-        var out = filter.simulate(simInput)
+        let out = filter.simulate(simInput)
         out.should.be.an.Array
         out.length.should.equal(10000)
         out[111].should.not.equal(simInput[111])
@@ -391,7 +391,7 @@ describe('iir.js', function () {
 
 
       it('calculates filter response', function () {
-        var r = filter.response(200)
+        let r = filter.response(200)
         r.should.be.an.Array
         r.length.should.equal(200)
         r[20].should.be.an.Object
@@ -421,7 +421,7 @@ describe('iir.js', function () {
   describe('fir-helpers', function () {
 
     it('can get available filters', function () {
-      var av = firCalculator.available()
+      let av = firCalculator.available()
       av.length.should.not.equal(0)
       av[1].should.be.a.String
     })

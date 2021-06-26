@@ -6,8 +6,8 @@ import Fft from '../src/fft.js'
 
 
 describe('fft.js', () => {
-  var fftCalc: any
-  var sinewave: any = []
+  let fftCalc: any
+  let sinewave: any = []
 
   
   before(function () {
@@ -22,7 +22,7 @@ describe('fft.js', () => {
 
   
   describe('fft_calc', function () {
-    var fftResult: any, magnitude: any
+    let fftResult: any, magnitude: any
     
     it('can forward', function () {
       fftResult = fftCalc.forward(sinewave, 'hanning')
@@ -41,21 +41,21 @@ describe('fft.js', () => {
 
     
     it('can calculate the phase', function () {
-      var phase = fftCalc.phase(fftResult)
+      let phase = fftCalc.phase(fftResult)
       expect(phase.length).to.equal(8192)
       expect(phase[1111]).to.be.a('number')
     })
 
     
     it('can calculate the magnitude in dB', function () {
-      var magdb = fftCalc.magToDb(magnitude)
+      let magdb = fftCalc.magToDb(magnitude)
       expect(magdb.length).to.equal(8192)
       expect(magdb[888]).to.be.a('number')
     })
 
     
     it('can inverse', function () {
-      var original = fftCalc.inverse(fftResult.re, fftResult.im)
+      let original = fftCalc.inverse(fftResult.re, fftResult.im)
       expect(original.length).to.equal(8192)
       expect(original[777]).to.be.a('number')
     })
@@ -63,8 +63,8 @@ describe('fft.js', () => {
     
     it('can calculate with all window functions', function(this: any) {
       this.timeout(20000)
-      var w = fftCalc.windows()
-      for (var i = 0; i < w.length; i++) {
+      let w = fftCalc.windows()
+      for (let i = 0; i < w.length; i++) {
         fftResult = fftCalc.forward(sinewave, w[i])
         expect(fftResult.re.length).to.equal(8192)
         expect(fftResult.im.length).to.equal(8192)
@@ -78,7 +78,7 @@ describe('fft.js', () => {
   describe('fft_helpers', function () {
     
     it('can get available windows', function () {
-      var w = fftCalc.windows()
+      let w = fftCalc.windows()
       expect(w.length).to.not.equal(0)
       expect(w[2]).to.be.a('string')
     })

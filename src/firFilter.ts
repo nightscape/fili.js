@@ -2,7 +2,7 @@
 
 import Complex from "./complex"
 
-var {
+let {
   runMultiFilter,
   runMultiFilterReverse,
   complex,
@@ -21,7 +21,7 @@ export default class FirFilter {
     this.f = filter
     let cnt = 0
     // note: coefficients are equal to input response
-    for (cnt = 0; cnt < this.f.length; cnt++) {
+    for (let cnt = 0; cnt < this.f.length; cnt++) {
       this.b[cnt] = {
         re: this.f[cnt],
         im: 0
@@ -31,8 +31,8 @@ export default class FirFilter {
   }
 
   static initZero(cnt: any) {
-    var r = []
-    var i
+    let r = []
+    let i
     for (i = 0; i < cnt; i++) {
       r.push(0)
     }
@@ -44,9 +44,9 @@ export default class FirFilter {
 
   doStep(input: any, d: any) {
     d.buf[d.pointer] = input
-    var out = 0
+    let out = 0
     let cnt = 0
-    for (cnt = 0; cnt < d.buf.length; cnt++) {
+    for (let cnt = 0; cnt < d.buf.length; cnt++) {
       out += (this.f[cnt] * d.buf[(d.pointer + cnt) % d.buf.length])
     }
     d.pointer = (d.pointer + 1) % (d.buf.length)
@@ -54,29 +54,29 @@ export default class FirFilter {
   }
 
   calcInputResponse(input: any) {
-    var tempF = FirFilter.initZero(this.f.length - 1)
+    let tempF = FirFilter.initZero(this.f.length - 1)
     return runMultiFilter(input, tempF, (input: any, coeffs: any) => this.doStep(input, coeffs))
   }
 
   calcResponse(params: any) {
-    var Fs = params.Fs
-    var Fr = params.Fr
+    let Fs = params.Fs
+    let Fr = params.Fr
     // z = exp(j*omega*pi) = cos(omega*pi) + j*sin(omega*pi)
     // z^-1 = exp(-j*omega*pi)
     // omega is between 0 and 1. 1 is the Nyquist frequency.
-    var theta = -Math.PI * (Fr / Fs) * 2
-    var h = {
+    let theta = -Math.PI * (Fr / Fs) * 2
+    let h = {
       re: 0,
       im: 0
     }
-    for (var i = 0; i < this.f.length - 1; i++) {
+    for (let i = 0; i < this.f.length - 1; i++) {
       h = complex.add(h, complex.mul(this.b[i], {
         re: Math.cos(theta * i),
         im: Math.sin(theta * i)
       }))
     }
-    var m = complex.magnitude(h)
-    var res = {
+    let m = complex.magnitude(h)
+    let res = {
       magnitude: m,
       phase: complex.phase(h),
       dBmagnitude: 20 * Math.log(m) * Math.LOG10E
@@ -89,10 +89,10 @@ export default class FirFilter {
   }
   response(resolution: any) {
     resolution = resolution || 100
-    var res = []
+    let res = []
     let cnt = 0
-    var r = resolution * 2
-    for (cnt = 0; cnt < resolution; cnt++) {
+    let r = resolution * 2
+    for (let cnt = 0; cnt < resolution; cnt++) {
       res[cnt] = this.calcResponse({
         Fs: r,
         Fr: cnt

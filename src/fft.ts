@@ -1,7 +1,7 @@
 'use strict';
 export default class Fft {
     radix: number
-    fft: any
+    fft: FftData
     windowCalculation: {
         [key: string]: { calc: (...params: any[]) => number, values: number[], correction: number }
         rectangular: { calc: () => number; values: never[]; correction: number; }; none: { calc: () => number; values: never[]; correction: number; }; hanning: { calc: (n: any, N: any) => number; values: never[]; correction: number; }; hamming: { calc: (n: any, N: any) => number; values: never[]; correction: number; }; tukery: { calc: (n: any, N: any, a: any) => number; values: never[]; correction: number; }; cosine: { calc: (n: any, N: any) => number; values: never[]; correction: number; }; lanczos: { calc: (n: any, N: any) => number; values: never[]; correction: number; }; triangular: { calc: (n: any, N: any) => number; values: never[]; correction: number; }; bartlett: { calc: (n: any, N: any) => number; values: never[]; correction: number; }; gaussian: { calc: (n: any, N: any, a: any) => number; values: never[]; correction: number; }; bartlettHanning: { calc: (n: any, N: any) => number; values: never[]; correction: number; }; blackman: { calc: (n: any, N: any, a: any) => number; values: never[]; correction: number; }; blackmanHarris: { calc: (n: any, N: any) => number; values: never[]; correction: number; }; nuttall3: { calc: (n: any, N: any) => number; values: never[]; correction: number; }; nuttall3a: { calc: (n: any, N: any) => number; values: never[]; correction: number; }; nuttall3b: { calc: (n: any, N: any) => number; values: never[]; correction: number; }; nuttall4: { calc: (n: any, N: any) => number; values: never[]; correction: number; }; nuttall4a: { calc: (n: any, N: any) => number; values: never[]; correction: number; }; nuttall4b: { calc: (n: any, N: any) => number; values: never[]; correction: number; }; nuttall4c: { calc: (n: any, N: any) => number; values: never[]; correction: number; };
@@ -23,7 +23,7 @@ export default class Fft {
             throw new Error("Radix can only be a power of 2");
 
         }
-        this.fft = {};
+        this.fft = {} as FftData;
         this.fft.length = radix;
         this.fft.buffer = new Float64Array(radix);
         this.fft.re = new Float64Array(radix);
@@ -33,15 +33,15 @@ export default class Fft {
         this.fft.twiddle = new Int32Array(radix);
         this.fft.sinTable = new Float64Array(radix - 1);
         this.fft.cosTable = new Float64Array(radix - 1);
-        var TPI = 2 * Math.PI;
-        var bits = Math.floor(Math.log(radix) / Math.LN2);
-        for (i = this.fft.sinTable.length; i--;) {
+        let TPI = 2 * Math.PI;
+        let bits = Math.floor(Math.log(radix) / Math.LN2);
+        for (let i = this.fft.sinTable.length; i--;) {
             this.fft.sinTable[i] = Math.sin(TPI * (i / radix));
             this.fft.cosTable[i] = Math.cos(TPI * (i / radix));
         }
-        var nh = radix >> 1;
-        var i = 0;
-        var j = 0;
+        let nh = radix >> 1;
+        let i = 0;
+        let j = 0;
         for (; ;) {
             this.fft.twiddle[i] = j;
             if (++i >= radix) {
@@ -55,16 +55,16 @@ export default class Fft {
             j += bits;
         }
         // good explanation in https://holometer.fnal.gov/GH_FFT.pdf
-        var PI = Math.PI;
-        var PI2 = Math.PI * 2;
-        var abs = Math.abs;
-        var pow = Math.pow;
-        var cos = Math.cos;
-        var sin = Math.sin;
-        var sinc = function (x: any) {
+        let PI = Math.PI;
+        let PI2 = Math.PI * 2;
+        let abs = Math.abs;
+        let pow = Math.pow;
+        let cos = Math.cos;
+        let sin = Math.sin;
+        let sinc = function (x: any) {
             return sin(PI * x) / (PI * x);
         };
-        var E = Math.E;
+        let E = Math.E;
         this.windowCalculation = {
             rectangular: {
                 calc: function () {
@@ -82,7 +82,7 @@ export default class Fft {
             },
             hanning: {
                 calc: function (n: any, N: any) {
-                    var z = (PI2 * n) / (N - 1);
+                    let z = (PI2 * n) / (N - 1);
                     return 0.5 * (1 - cos(z));
                 },
                 values: [],
@@ -90,7 +90,7 @@ export default class Fft {
             },
             hamming: {
                 calc: function (n: any, N: any) {
-                    var z = (PI2 * n) / (N - 1);
+                    let z = (PI2 * n) / (N - 1);
                     return 0.54 - 0.46 * cos(z);
                 },
                 values: [],
@@ -148,7 +148,7 @@ export default class Fft {
             },
             bartlettHanning: {
                 calc: function (n: any, N: any) {
-                    var z = (PI2 * n) / (N - 1);
+                    let z = (PI2 * n) / (N - 1);
                     return 0.62 - 0.48 * abs((n / (N - 1)) - 0.5) - 0.38 * cos(z);
                 },
                 values: [],
@@ -156,10 +156,10 @@ export default class Fft {
             },
             blackman: {
                 calc: function (n: any, N: any, a: any) {
-                    var a0 = (1 - a) / 2;
-                    var a1 = 0.5;
-                    var a2 = a / 2;
-                    var z = (PI2 * n) / (N - 1);
+                    let a0 = (1 - a) / 2;
+                    let a1 = 0.5;
+                    let a2 = a / 2;
+                    let z = (PI2 * n) / (N - 1);
                     return a0 - a1 * cos(z) + a2 * cos(2 * z);
                 },
                 values: [],
@@ -167,7 +167,7 @@ export default class Fft {
             },
             blackmanHarris: {
                 calc: function (n: any, N: any) {
-                    var z = (PI2 * n) / (N - 1);
+                    let z = (PI2 * n) / (N - 1);
                     return 0.35875 - 0.48829 * cos(z) + 0.14128 * cos(2 * z) - 0.01168 * cos(3 * z);
                 },
                 values: [],
@@ -175,7 +175,7 @@ export default class Fft {
             },
             nuttall3: {
                 calc: function (n: any, N: any) {
-                    var z = (PI2 * n) / (N - 1);
+                    let z = (PI2 * n) / (N - 1);
                     return 0.375 - 0.5 * cos(z) + 0.125 * cos(2 * z);
                 },
                 values: [],
@@ -183,7 +183,7 @@ export default class Fft {
             },
             nuttall3a: {
                 calc: function (n: any, N: any) {
-                    var z = (PI2 * n) / (N - 1);
+                    let z = (PI2 * n) / (N - 1);
                     return 0.40897 - 0.5 * cos(z) + 0.09103 * cos(2 * z);
                 },
                 values: [],
@@ -191,7 +191,7 @@ export default class Fft {
             },
             nuttall3b: {
                 calc: function (n: any, N: any) {
-                    var z = (PI2 * n) / (N - 1);
+                    let z = (PI2 * n) / (N - 1);
                     return 0.4243801 - 0.4973406 * cos(z) + 0.078793 * cos(2 * z);
                 },
                 values: [],
@@ -199,7 +199,7 @@ export default class Fft {
             },
             nuttall4: {
                 calc: function (n: any, N: any) {
-                    var z = (PI2 * n) / (N - 1);
+                    let z = (PI2 * n) / (N - 1);
                     return 0.3125 - 0.46875 * cos(z) + 0.1875 * cos(2 * z) - 0.03125 * cos(3 * z);
                 },
                 values: [],
@@ -207,7 +207,7 @@ export default class Fft {
             },
             nuttall4a: {
                 calc: function (n: any, N: any) {
-                    var z = (PI2 * n) / (N - 1);
+                    let z = (PI2 * n) / (N - 1);
                     return 0.338946 - 0.481973 * cos(z) + 0.161054 * cos(2 * z) - 0.018027 * cos(3 * z);
                 },
                 values: [],
@@ -215,7 +215,7 @@ export default class Fft {
             },
             nuttall4b: {
                 calc: function (n: any, N: any) {
-                    var z = (PI2 * n) / (N - 1);
+                    let z = (PI2 * n) / (N - 1);
                     return 0.355768 - 0.481973 * cos(z) + 0.144232 * cos(2 * z) - 0.012604 * cos(3 * z);
                 },
                 values: [],
@@ -223,7 +223,7 @@ export default class Fft {
             },
             nuttall4c: {
                 calc: function (n: any, N: any) {
-                    var z = (PI2 * n) / (N - 1);
+                    let z = (PI2 * n) / (N - 1);
                     return 0.3635819 - 0.4891775 * cos(z) + 0.1365995 * cos(2 * z) - 0.0106411 * cos(3 * z);
                 },
                 values: [],
@@ -232,7 +232,7 @@ export default class Fft {
             // fast decaying flat top
             sft3f: {
                 calc: function (n: any, N: any) {
-                    var z = (PI2 * n) / (N - 1);
+                    let z = (PI2 * n) / (N - 1);
                     return 0.26526 - 0.5 * cos(z) + 0.23474 * cos(2 * z);
                 },
                 values: [],
@@ -240,7 +240,7 @@ export default class Fft {
             },
             sft4f: {
                 calc: function (n: any, N: any) {
-                    var z = (PI2 * n) / (N - 1);
+                    let z = (PI2 * n) / (N - 1);
                     return 0.21706 - 0.42103 * cos(z) + 0.28294 * cos(2 * z) - 0.07897 * cos(3 * z);
                 },
                 values: [],
@@ -248,7 +248,7 @@ export default class Fft {
             },
             sft5f: {
                 calc: function (n: any, N: any) {
-                    var z = (PI2 * n) / (N - 1);
+                    let z = (PI2 * n) / (N - 1);
                     return 0.1881 - 0.36923 * cos(z) + 0.28702 * cos(2 * z) - 0.13077 * cos(3 * z) + 0.02488 * cos(4 * z);
                 },
                 values: [],
@@ -257,7 +257,7 @@ export default class Fft {
             // minimum sidelobe flat top
             sft3m: {
                 calc: function (n: any, N: any) {
-                    var z = (PI2 * n) / (N - 1);
+                    let z = (PI2 * n) / (N - 1);
                     return 0.28235 - 0.52105 * cos(z) + 0.19659 * cos(2 * z);
                 },
                 values: [],
@@ -265,7 +265,7 @@ export default class Fft {
             },
             sft4m: {
                 calc: function (n: any, N: any) {
-                    var z = (PI2 * n) / (N - 1);
+                    let z = (PI2 * n) / (N - 1);
                     return 0.241906 - 0.460841 * cos(z) + 0.2552381 * cos(2 * z) - 0.041872 * cos(3 * z);
                 },
                 values: [],
@@ -273,7 +273,7 @@ export default class Fft {
             },
             sft5m: {
                 calc: function (n: any, N: any) {
-                    var z = (PI2 * n) / (N - 1);
+                    let z = (PI2 * n) / (N - 1);
                     return 0.209671 - 0.407331 * cos(z) + 0.281225 * cos(2 * z) - 0.092669 * cos(3 * z) + 0.0091036 * cos(4 * z);
                 },
                 values: [],
@@ -281,7 +281,7 @@ export default class Fft {
             },
             nift: {
                 calc: function (n: any, N: any) {
-                    var z = (PI2 * n) / (N - 1);
+                    let z = (PI2 * n) / (N - 1);
                     return 0.2810639 - 0.5208972 * cos(z) + 0.1980399 * cos(2 * z);
                 },
                 values: [],
@@ -289,7 +289,7 @@ export default class Fft {
             },
             hpft: {
                 calc: function (n: any, N: any) {
-                    var z = (PI2 * n) / (N - 1);
+                    let z = (PI2 * n) / (N - 1);
                     return (1.0 - 1.912510941 * cos(z) + 1.079173272 * cos(2 * z) - 0.1832630879 * cos(3 * z)) / N;
                 },
                 values: [],
@@ -297,7 +297,7 @@ export default class Fft {
             },
             srft: {
                 calc: function (n: any, N: any) {
-                    var z = (PI2 * n) / (N - 1);
+                    let z = (PI2 * n) / (N - 1);
                     return (1.0 - 1.93 * cos(z) + 1.29 * cos(2 * z) - 0.388 * cos(3 * z) + 0.028 * cos(4 * z)) / N;
                 },
                 values: [],
@@ -305,7 +305,7 @@ export default class Fft {
             },
             hft70: {
                 calc: function (n: any, N: any) {
-                    var z = (PI2 * n) / (N - 1);
+                    let z = (PI2 * n) / (N - 1);
                     return (1.0 - 1.90796 * cos(z) + 1.07349 * cos(2 * z) - 0.18199 * cos(3 * z)) / N;
                 },
                 values: [],
@@ -313,7 +313,7 @@ export default class Fft {
             },
             hft95: {
                 calc: function (n: any, N: any) {
-                    var z = (PI2 * n) / (N - 1);
+                    let z = (PI2 * n) / (N - 1);
                     return (1.0 - 1.9383379 * cos(z) + 1.3045202 * cos(2 * z) - 0.402827 * cos(3 * z) + 0.0350665 * cos(4 * z)) / N;
                 },
                 values: [],
@@ -321,7 +321,7 @@ export default class Fft {
             },
             hft90d: {
                 calc: function (n: any, N: any) {
-                    var z = (PI2 * n) / (N - 1);
+                    let z = (PI2 * n) / (N - 1);
                     return (1.0 - 1.942604 * cos(z) + 1.340318 * cos(2 * z) - 0.440811 * cos(3 * z) + 0.043097 * cos(4 * z)) / N;
                 },
                 values: [],
@@ -329,7 +329,7 @@ export default class Fft {
             },
             hft116d: {
                 calc: function (n: any, N: any) {
-                    var z = (PI2 * n) / (N - 1);
+                    let z = (PI2 * n) / (N - 1);
                     return (1.0 - 1.9575375 * cos(z) + 1.4780705 * cos(2 * z) - 0.6367431 * cos(3 * z) + 0.1228389 * cos(4 * z) - 0.0066288 * cos(5 * z)) / N;
                 },
                 values: [],
@@ -337,7 +337,7 @@ export default class Fft {
             },
             hft144d: {
                 calc: function (n: any, N: any) {
-                    var z = (PI2 * n) / (N - 1);
+                    let z = (PI2 * n) / (N - 1);
                     return (1.0 - 1.96760033 * cos(z) + 1.57983607 * cos(2 * z) - 0.81123644 * cos(3 * z) + 0.22583558 * cos(4 * z) - 0.02773848 * cos(5 * z) + 0.0009036 * cos(6 * z)) / N;
                 },
                 values: [],
@@ -345,7 +345,7 @@ export default class Fft {
             },
             hft196d: {
                 calc: function (n: any, N: any) {
-                    var z = (PI2 * n) / (N - 1);
+                    let z = (PI2 * n) / (N - 1);
                     return (1.0 - 1.97441842 * cos(z) + 1.65409888 * cos(2 * z) - 0.95788186 * cos(3 * z) + 0.3367342 * cos(4 * z) - 0.06364621 * cos(5 * z) + 0.00521942 * cos(6 * z) - 0.00010599 * cos(7 * z)) / N;
                 },
                 values: [],
@@ -353,7 +353,7 @@ export default class Fft {
             },
             hft223d: {
                 calc: function (n: any, N: any) {
-                    var z = (PI2 * n) / (N - 1);
+                    let z = (PI2 * n) / (N - 1);
                     return (1.0 - 1.98298997309 * cos(z) + 1.75556083063 * cos(2 * z) - 1.19037717712 * cos(3 * z) + 0.56155440797 * cos(4 * z) - 0.17296769663 * cos(5 * z) + 0.03233247087 * cos(6 * z) - 0.00324954578 * cos(7 * z) + 0.00013801040 * cos(8 * z) - 0.00000132725 * cos(9 * z)) / N;
                 },
                 values: [],
@@ -361,7 +361,7 @@ export default class Fft {
             },
             hft248d: {
                 calc: function (n: any, N: any) {
-                    var z = (PI2 * n) / (N - 1);
+                    let z = (PI2 * n) / (N - 1);
                     return (1.0 - 1.985844164102 * cos(z) + 1.791176438506 * cos(2 * z) - 1.282075284005 * cos(3 * z) + 0.667777530266 * cos(4 * z) - 0.240160796576 * cos(5 * z) + 0.056656381764 * cos(6 * z) - 0.008134974479 * cos(7 * z) + 0.00062454465 * cos(8 * z) - 0.000019808998 * cos(9 * z) + 0.000000132974 * cos(10 * z)) / N;
                 },
                 values: [],
@@ -383,15 +383,15 @@ export default class Fft {
     }
 
     forward(b: any, window: any) {
-        var i, j, n, k, k2, h, d, c, s, ik, dx, dy;
+        let i, j, n, k, k2, h, d, c, s, ik, dx, dy;
         n = this.fft.buffer.length;
-        var winFunction = {
+        let winFunction = {
             name: window,
             N: n,
             a: 0.5,
             n: 0
         };
-        var w = this.windowFunctions(winFunction);
+        let w = this.windowFunctions(winFunction);
         if (typeof w === 'number') {
             for (i = 0; i < n; ++i) {
                 winFunction.n = i;
@@ -432,7 +432,7 @@ export default class Fft {
         };
     }
     inverse(re: any, im: any) {
-        var i, j, n, k, k2, h, d, c, s, ik, dx, dy;
+        let i, j, n, k, k2, h, d, c, s, ik, dx, dy;
         n = re.length;
         for (i = n; i--;) {
             j = this.fft.twiddle[i];
@@ -464,32 +464,44 @@ export default class Fft {
         return this.fft.buffer;
     }
     magnitude(params: any) {
-        var ret = [];
+        let ret = [];
         for (let cnt = 0; cnt < params.re.length; cnt++) {
             ret.push(Math.sqrt(params.re[cnt] * params.re[cnt] + params.im[cnt] * params.im[cnt]));
         }
         return ret;
     }
     magToDb(b: any) {
-        var ret = [];
+        let ret = [];
         for (let cnt = 0; cnt < b.length; cnt++) {
             ret.push(20 * Math.log(b[cnt]) * Math.LOG10E);
         }
         return ret;
     }
     phase(params: any) {
-        var ret = [];
+        let ret = [];
         for (let cnt = 0; cnt < params.re.length; cnt++) {
             ret.push(Math.atan2(params.im[cnt], params.re[cnt]));
         }
         return ret;
     }
     windows() {
-        var winFuncs = [];
-        for (var k in this.windowCalculation) {
+        let winFuncs = [];
+        for (let k in this.windowCalculation) {
             winFuncs.push(k);
         }
         return winFuncs;
     }
 
+}
+
+export interface FftData {
+        length:number
+        buffer:Float64Array
+        re:Float64Array
+        im:Float64Array
+        reI:Float64Array
+        imI:Float64Array
+        twiddle:Int32Array
+        sinTable:Float64Array
+        cosTable:Float64Array
 }

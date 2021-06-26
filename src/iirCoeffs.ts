@@ -13,11 +13,11 @@ interface Coeffs {
 export default class IirCoeffs {
     [key: string]: (params: any) => Coeffs;
     static preCalc(params: any, coeffs: any) {
-        var Q = params.Q;
-        var Fc = params.Fc;
-        var Fs = params.Fs;
-        var pre = {} as Coeffs;
-        var w = 2 * Math.PI * Fc / Fs;
+        let Q = params.Q;
+        let Fc = params.Fc;
+        let Fs = params.Fs;
+        let pre = {} as Coeffs;
+        let w = 2 * Math.PI * Fc / Fs;
         if (params.BW) {
             
             pre.alpha = Math.sin(w) * Math.sinh(Math.log(2) / 2 * params.BW * w / Math.sin(w));
@@ -34,25 +34,25 @@ export default class IirCoeffs {
         return pre;
     };
     static preCalcGain(params: any) {
-        var Q = params.Q;
-        var Fc = params.Fc;
-        var Fs = params.Fs;
-        var pre = {} as Coeffs;
-        var w = 2 * Math.PI * Fc / Fs;
+        let Q = params.Q;
+        let Fc = params.Fc;
+        let Fs = params.Fs;
+        let pre = {} as Coeffs;
+        let w = 2 * Math.PI * Fc / Fs;
         pre.alpha = Math.sin(w) / (2 * Q);
         pre.cw = Math.cos(w);
         pre.A = Math.pow(10, params.gain / 40);
         return pre;
     };
     static initCoeffs(): Coeffs {
-        var coeffs = {} as Coeffs;
+        let coeffs = {} as Coeffs;
         coeffs.z = [0, 0];
         coeffs.a = [];
         coeffs.b = [];
         return coeffs;
     };
     fromPZ(params: any) {
-        var coeffs = IirCoeffs.initCoeffs();
+        let coeffs = IirCoeffs.initCoeffs();
         (coeffs as any).a0 = 1;
         (coeffs as any).b.push(1);
         (coeffs as any).b.push(-params.z0.re - params.z1.re);
@@ -69,12 +69,12 @@ export default class IirCoeffs {
     }
     // lowpass matched-z transform: H(s) = 1/(1+a's/w_c+b's^2/w_c)
     lowpassMZ(params: any) {
-        var coeffs = IirCoeffs.initCoeffs();
+        let coeffs = IirCoeffs.initCoeffs();
         (coeffs as any).a0 = 1;
-        var as = params.as;
-        var bs = params.bs;
-        var w = 2 * Math.PI * params.Fc / params.Fs;
-        var s = -(as / (2 * bs));
+        let as = params.as;
+        let bs = params.bs;
+        let w = 2 * Math.PI * params.Fc / params.Fs;
+        let s = -(as / (2 * bs));
         (coeffs as any).a.push(-Math.pow(Math.E, s * w) * 2 * Math.cos(-w * Math.sqrt(Math.abs(Math.pow(as, 2) / (4 * Math.pow(bs, 2)) - 1 / bs))));
         (coeffs as any).a.push(Math.pow(Math.E, 2 * s * w));
         // correct gain
@@ -92,7 +92,7 @@ export default class IirCoeffs {
     }
     // Bessel-Thomson: H(s) = 3/(s^2+3*s+3)
     lowpassBT(params: any) {
-        var coeffs = IirCoeffs.initCoeffs();
+        let coeffs = IirCoeffs.initCoeffs();
         params.Q = 1;
         (coeffs as any).wp = Math.tan((2 * Math.PI * params.Fc) / (2 * params.Fs));
         (coeffs as any).wp2 = (coeffs as any).wp * (coeffs as any).wp;
@@ -109,7 +109,7 @@ export default class IirCoeffs {
         return coeffs;
     }
     highpassBT(params: any) {
-        var coeffs = IirCoeffs.initCoeffs();
+        let coeffs = IirCoeffs.initCoeffs();
         params.Q = 1;
         (coeffs as any).wp = Math.tan((2 * Math.PI * params.Fc) / (2 * params.Fs));
         (coeffs as any).wp2 = (coeffs as any).wp * (coeffs as any).wp;
@@ -130,11 +130,11 @@ export default class IirCoeffs {
      */
     // H(s) = 1 / (s^2 + s/Q + 1)
     lowpass(params: any) {
-        var coeffs = IirCoeffs.initCoeffs();
+        let coeffs = IirCoeffs.initCoeffs();
         if (params.BW) {
             delete params.BW;
         }
-        var p = IirCoeffs.preCalc(params, coeffs);
+        let p = IirCoeffs.preCalc(params, coeffs);
         if (params.preGain) {
             (coeffs as any).k = (1 - (p as any).cw) * 0.5;
             (coeffs as any).b.push(1 / ((p as any).a0));
@@ -149,11 +149,11 @@ export default class IirCoeffs {
     }
     // H(s) = s^2 / (s^2 + s/Q + 1)
     highpass(params: any) {
-        var coeffs = IirCoeffs.initCoeffs();
+        let coeffs = IirCoeffs.initCoeffs();
         if (params.BW) {
             delete params.BW;
         }
-        var p = IirCoeffs.preCalc(params, coeffs);
+        let p = IirCoeffs.preCalc(params, coeffs);
         if (params.preGain) {
             (coeffs as any).k = (1 + (p as any).cw) * 0.5;
             (coeffs as any).b.push(1 / ((p as any).a0));
@@ -168,11 +168,11 @@ export default class IirCoeffs {
     }
     // H(s) = (s^2 - s/Q + 1) / (s^2 + s/Q + 1)
     allpass(params: any) {
-        var coeffs = IirCoeffs.initCoeffs();
+        let coeffs = IirCoeffs.initCoeffs();
         if (params.BW) {
             delete params.BW;
         }
-        var p = IirCoeffs.preCalc(params, coeffs);
+        let p = IirCoeffs.preCalc(params, coeffs);
         (coeffs as any).k = 1;
         (coeffs as any).b.push((1 - (p as any).alpha) / (p as any).a0);
         (coeffs as any).b.push(-2 * (p as any).cw / (p as any).a0);
@@ -181,8 +181,8 @@ export default class IirCoeffs {
     }
     // H(s) = s / (s^2 + s/Q + 1)
     bandpassQ(params: any) {
-        var coeffs = IirCoeffs.initCoeffs();
-        var p = IirCoeffs.preCalc(params, coeffs);
+        let coeffs = IirCoeffs.initCoeffs();
+        let p = IirCoeffs.preCalc(params, coeffs);
         (coeffs as any).k = 1;
         (coeffs as any).b.push((p as any).alpha * params.Q / (p as any).a0);
         (coeffs as any).b.push(0);
@@ -191,8 +191,8 @@ export default class IirCoeffs {
     }
     // H(s) = (s/Q) / (s^2 + s/Q + 1)
     bandpass(params: any) {
-        var coeffs = IirCoeffs.initCoeffs();
-        var p = IirCoeffs.preCalc(params, coeffs);
+        let coeffs = IirCoeffs.initCoeffs();
+        let p = IirCoeffs.preCalc(params, coeffs);
         (coeffs as any).k = 1;
         (coeffs as any).b.push((p as any).alpha / (p as any).a0);
         (coeffs as any).b.push(0);
@@ -201,8 +201,8 @@ export default class IirCoeffs {
     }
     // H(s) = (s^2 + 1) / (s^2 + s/Q + 1)
     bandstop(params: any) {
-        var coeffs = IirCoeffs.initCoeffs();
-        var p = IirCoeffs.preCalc(params, coeffs);
+        let coeffs = IirCoeffs.initCoeffs();
+        let p = IirCoeffs.preCalc(params, coeffs);
         (coeffs as any).k = 1;
         (coeffs as any).b.push(1 / (p as any).a0);
         (coeffs as any).b.push(-2 * (p as any).cw / (p as any).a0);
@@ -211,8 +211,8 @@ export default class IirCoeffs {
     }
     // H(s) = (s^2 + s*(A/Q) + 1) / (s^2 + s/(A*Q) + 1)
     peak(params: any) {
-        var coeffs = IirCoeffs.initCoeffs();
-        var p = IirCoeffs.preCalcGain(params);
+        let coeffs = IirCoeffs.initCoeffs();
+        let p = IirCoeffs.preCalcGain(params);
         (coeffs as any).k = 1;
         (coeffs as any).a0 = 1 + (p as any).alpha / (p as any).A;
         (coeffs as any).a.push(-2 * (p as any).cw / (coeffs as any).a0);
@@ -224,13 +224,13 @@ export default class IirCoeffs {
     }
     // H(s) = A * (s^2 + (sqrt(A)/Q)*s + A)/(A*s^2 + (sqrt(A)/Q)*s + 1)
     lowshelf(params: any) {
-        var coeffs = IirCoeffs.initCoeffs();
+        let coeffs = IirCoeffs.initCoeffs();
         if (params.BW) {
             delete params.BW;
         }
-        var p = IirCoeffs.preCalcGain(params);
+        let p = IirCoeffs.preCalcGain(params);
         (coeffs as any).k = 1;
-        var sa = 2 * Math.sqrt((p as any).A) * (p as any).alpha;
+        let sa = 2 * Math.sqrt((p as any).A) * (p as any).alpha;
         (coeffs as any).a0 = ((p as any).A + 1) + ((p as any).A - 1) * (p as any).cw + sa;
         (coeffs as any).a.push((-2 * (((p as any).A - 1) + ((p as any).A + 1) * (p as any).cw)) / (coeffs as any).a0);
         (coeffs as any).a.push((((p as any).A + 1) + ((p as any).A - 1) * (p as any).cw - sa) / (coeffs as any).a0);
@@ -241,13 +241,13 @@ export default class IirCoeffs {
     }
     // H(s) = A * (A*s^2 + (sqrt(A)/Q)*s + 1)/(s^2 + (sqrt(A)/Q)*s + A)
     highshelf(params: any) {
-        var coeffs = IirCoeffs.initCoeffs();
+        let coeffs = IirCoeffs.initCoeffs();
         if (params.BW) {
             delete params.BW;
         }
-        var p = IirCoeffs.preCalcGain(params);
+        let p = IirCoeffs.preCalcGain(params);
         (coeffs as any).k = 1;
-        var sa = 2 * Math.sqrt((p as any).A) * (p as any).alpha;
+        let sa = 2 * Math.sqrt((p as any).A) * (p as any).alpha;
         (coeffs as any).a0 = ((p as any).A + 1) - ((p as any).A - 1) * (p as any).cw + sa;
         (coeffs as any).a.push((2 * (((p as any).A - 1) - ((p as any).A + 1) * (p as any).cw)) / (coeffs as any).a0);
         (coeffs as any).a.push((((p as any).A + 1) - ((p as any).A - 1) * (p as any).cw - sa) / (coeffs as any).a0);
@@ -259,12 +259,12 @@ export default class IirCoeffs {
     // taken from: Design of digital filters for frequency weightings (A and C) required for risk assessments of workers exposed to noise
     // use Butterworth one stage IIR filter to get the results from the paper
     aweighting(params: any) {
-        var coeffs = IirCoeffs.initCoeffs();
+        let coeffs = IirCoeffs.initCoeffs();
         (coeffs as any).k = 1;
-        var wo = 2 * Math.PI * params.Fc / params.Fs;
-        var w = 2 * Math.tan(wo / 2);
-        var Q = params.Q;
-        var wsq = Math.pow(w, 2);
+        let wo = 2 * Math.PI * params.Fc / params.Fs;
+        let w = 2 * Math.tan(wo / 2);
+        let Q = params.Q;
+        let wsq = Math.pow(w, 2);
         (coeffs as any).a0 = 4 * Q + wsq * Q + 2 * w;
         (coeffs as any).a.push(2 * wsq * Q - 8 * Q);
         (coeffs as any).a.push((4 * Q + wsq * Q - 2 * w));

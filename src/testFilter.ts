@@ -20,8 +20,8 @@ export default class TestFilter {
   }
 
   stepValues(params: any) {
-    var max = params.offset + params.pp
-    var min = params.offset - params.pp
+    let max = params.offset + params.pp
+    let min = params.offset - params.pp
     for (let cnt = 0; cnt < params.steps; cnt++) {
       if ((cnt % 200) < 100) {
         this.simData.push(this.f.singleStep(max))
@@ -32,8 +32,8 @@ export default class TestFilter {
   }
 
   impulseValues(params: any) {
-    var max = params.offset + params.pp
-    var min = params.offset - params.pp
+    let max = params.offset + params.pp
+    let min = params.offset - params.pp
     for (let cnt = 0; cnt < params.steps; cnt++) {
       if (cnt % 100 === 0) {
         this.simData.push(this.f.singleStep(max))
@@ -44,10 +44,10 @@ export default class TestFilter {
   }
 
   rampValues(params: any) {
-    var max = params.offset + params.pp
-    var min = params.offset - params.pp
-    var val = min
-    var diff = (max - min) / 100
+    let max = params.offset + params.pp
+    let min = params.offset - params.pp
+    let val = min
+    let diff = (max - min) / 100
     for (let cnt = 0; cnt < params.steps; cnt++) {
       if (cnt % 200 < 100) {
         val += diff
@@ -72,9 +72,9 @@ export default class TestFilter {
   directedRandomStability(params: any) {
     this.f.reinit()
     this.simData.length = 0
-    var i
+    let i
     for (i = 0; i < params.tests; i++) {
-      var choose = Math.random()
+      let choose = Math.random()
       if (choose < 0.25) {
         this.randomValues(params)
       } else if (choose < 0.5) {

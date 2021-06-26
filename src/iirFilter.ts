@@ -1,6 +1,6 @@
 'use strict';
 
-var { complex, runMultiFilter, runMultiFilterReverse, evaluatePhase } = require('./utils');
+let { complex, runMultiFilter, runMultiFilterReverse, evaluatePhase } = require('./utils');
 // params: array of biquad coefficient objects and z registers
 // stage structure e.g. {k:1, a:[1.1, -1.2], b:[0.3, -1.2, -0.4], z:[0, 0]}
 export default class IirFilter {
@@ -16,7 +16,7 @@ export default class IirFilter {
 
         for (let cnt = 0; cnt < this.f.length; cnt++) {
             this.cf[cnt] = {};
-            var s = this.f[cnt];
+            let s = this.f[cnt];
             this.cf[cnt].b0 = {
                 re: s.b[0],
                 im: 0
@@ -50,36 +50,36 @@ export default class IirFilter {
         }
     }
     runStage(s: any, input: any) {
-        var temp = input * s.k.re - s.a1.re * s.z[0] - s.a2.re * s.z[1];
-        var out = s.b0.re * temp + s.b1.re * s.z[0] + s.b2.re * s.z[1];
+        let temp = input * s.k.re - s.a1.re * s.z[0] - s.a2.re * s.z[1];
+        let out = s.b0.re * temp + s.b1.re * s.z[0] + s.b2.re * s.z[1];
         s.z[1] = s.z[0];
         s.z[0] = temp;
         return out;
     }
     doStep(input: any, coeffs: any) {
-        var out = input;
+        let out = input;
         let cnt = 0;
-        for (cnt = 0; cnt < coeffs.length; cnt++) {
+        for (let cnt = 0; cnt < coeffs.length; cnt++) {
             out = this.runStage(coeffs[cnt], out);
         }
         return out;
     }
     biquadResponse(params: any, s: any) {
-        var Fs = params.Fs;
-        var Fr = params.Fr;
+        let Fs = params.Fs;
+        let Fr = params.Fr;
         // z = exp(j*omega*pi) = cos(omega*pi) + j*sin(omega*pi)
         // z^-1 = exp(-j*omega*pi)
         // omega is between 0 and 1. 1 is the Nyquist frequency.
-        var theta = -Math.PI * (Fr / Fs) * 2;
-        var z = {
+        let theta = -Math.PI * (Fr / Fs) * 2;
+        let z = {
             re: Math.cos(theta),
             im: Math.sin(theta)
         };
         // k * (b0 + b1*z^-1 + b2*z^-2) / (1 + a1*z^⁻1 + a2*z^-2)
-        var p = complex.mul(s.k, complex.add(s.b0, complex.mul(z, complex.add(s.b1, complex.mul(s.b2, z)))));
-        var q = complex.add(this.cone, complex.mul(z, complex.add(s.a1, complex.mul(s.a2, z))));
-        var h = complex.div(p, q);
-        var res = {
+        let p = complex.mul(s.k, complex.add(s.b0, complex.mul(z, complex.add(s.b1, complex.mul(s.b2, z)))));
+        let q = complex.add(this.cone, complex.mul(z, complex.add(s.a1, complex.mul(s.a2, z))));
+        let h = complex.div(p, q);
+        let res = {
             magnitude: complex.magnitude(h),
             phase: complex.phase(h)
         };
@@ -87,13 +87,13 @@ export default class IirFilter {
     }
     calcResponse(params: any) {
         let cnt = 0;
-        var res = {
+        let res = {
             magnitude: 1,
             phase: 0,
             dBmagnitude: 0
         };
-        for (cnt = 0; cnt < this.cf.length; cnt++) {
-            var r = this.biquadResponse(params, this.cf[cnt]);
+        for (let cnt = 0; cnt < this.cf.length; cnt++) {
+            let r = this.biquadResponse(params, this.cf[cnt]);
             // a cascade of biquads results in the multiplication of H(z)
             // H_casc(z) = H_0(z) * H_1(z) * ... * H_n(z)
             res.magnitude *= r.magnitude;
@@ -104,9 +104,9 @@ export default class IirFilter {
         return res;
     }
     reinit() {
-        var tempF = [];
+        let tempF = [];
         for (let cnt = 0; cnt < this.f.length; cnt++) {
-            var s = this.f[cnt];
+            let s = this.f[cnt];
             tempF[cnt] = {
                 b0: {
                     re: s.b[0],
@@ -138,20 +138,20 @@ export default class IirFilter {
         return tempF;
     }
     calcInputResponse(input: any) {
-        var tempF = this.reinit();
+        let tempF = this.reinit();
         return runMultiFilter(input, tempF, (input: any, coeffs: any) => this.doStep(input, coeffs));
     }
     predefinedResponse(def: any, length: any) {
-        var ret = {};
-        var input = [];
+        let ret = {};
+        let input = [];
         let cnt = 0;
-        for (cnt = 0; cnt < length; cnt++) {
+        for (let cnt = 0; cnt < length; cnt++) {
             input.push(def(cnt));
         }
         (ret as any).out = this.calcInputResponse(input);
-        var maxFound = false;
-        var minFound = false;
-        for (cnt = 0; cnt < length - 1; cnt++) {
+        let maxFound = false;
+        let minFound = false;
+        for (let cnt = 0; cnt < length - 1; cnt++) {
             if ((ret as any).out[cnt] > (ret as any).out[cnt + 1] && !maxFound) {
                 maxFound = true;
                 (ret as any).max = {
@@ -171,7 +171,7 @@ export default class IirFilter {
         return ret;
     };
     getComplRes(n1: any, n2: any) {
-        var innerSqrt = Math.pow(n1 / 2, 2) - n2;
+        let innerSqrt = Math.pow(n1 / 2, 2) - n2;
         if (innerSqrt < 0) {
             return [{
                 re: -n1 / 2,
@@ -192,7 +192,7 @@ export default class IirFilter {
         }
     };
     getPZ() {
-        var res = [];
+        let res = [];
         for (let cnt = 0; cnt < this.cc.length; cnt++) {
             res[cnt] = {};
             (res[cnt] as any).z = this.getComplRes(this.cc[cnt].b1, this.cc[cnt].b2);
@@ -232,10 +232,10 @@ export default class IirFilter {
     }
     response(resolution: any) {
         resolution = resolution || 100;
-        var res = [];
+        let res = [];
         let cnt = 0;
-        var r = resolution * 2;
-        for (cnt = 0; cnt < resolution; cnt++) {
+        let r = resolution * 2;
+        for (let cnt = 0; cnt < resolution; cnt++) {
             res[cnt] = this.calcResponse({
                 Fs: r,
                 Fr: cnt
@@ -249,7 +249,7 @@ export default class IirFilter {
     }
     reInit() {
         let cnt = 0
-        for (cnt = 0; cnt < this.cf.length; cnt++) {
+        for (let cnt = 0; cnt < this.cf.length; cnt++) {
             this.cf[cnt].z = [0, 0];
         }
     }

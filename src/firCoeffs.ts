@@ -4,16 +4,16 @@ export default class FirCoeffs {
   // Kaiser windowd filters
   // desired attenuation can be defined
   // better than windowd sinc filters
-  static calcKImpulseResponse(params: FirParams) {
-    var Fs = params.Fs
-    var Fa = params.Fa
-    var Fb = params.Fb
-    var o = params.order || 51
-    var alpha = params.Att || 100
-    var ino = function (val: any) {
-      var d = 0
-      var ds = 1
-      var s = 1
+  static calcKImpulseResponse(params: FirParams): number[] {
+    let Fs = params.Fs
+    let Fa = params.Fa
+    let Fb = params.Fb
+    let o = params.order || 51
+    let alpha = params.Att || 100
+    let ino = function (val: any) {
+      let d = 0
+      let ds = 1
+      let s = 1
       while (ds > s * 1e-6) {
         d += 2
         ds *= val * val / (d * d)
@@ -25,10 +25,10 @@ export default class FirCoeffs {
     if (o / 2 - Math.floor(o / 2) === 0) {
       o++
     }
-    var Np = (o - 1) / 2
-    var A: number[] = []
-    var beta = 0
-    var ret: number[] = []
+    let Np = (o - 1) / 2
+    let A: number[] = []
+    let beta = 0
+    let ret: number[] = []
 
     A[0] = 2 * (Fb - Fa) / Fs
     for (let cnt = 1; cnt <= Np; cnt++) {
@@ -43,7 +43,7 @@ export default class FirCoeffs {
       beta = 0.5842 * Math.pow((alpha - 21), 0.4) + 0.07886 * (alpha - 21)
     }
 
-    var inoBeta = ino(beta)
+    let inoBeta = ino(beta)
     for (let cnt = 0; cnt <= Np; cnt++) {
       ret[Np + cnt] = A[cnt] * ino(beta * Math.sqrt(1 - (cnt * cnt / (Np * Np)))) / inoBeta
     }
@@ -56,12 +56,12 @@ export default class FirCoeffs {
   // note: coefficients are equal to impulse response
   // windowd sinc filter
   static calcImpulseResponse(params: FirParams) {
-    var Fs = params.Fs
-    var Fc = params.Fc
-    var o = params.order
-    var omega = 2 * Math.PI * Fc / Fs
-    var dc = 0
-    var ret = []
+    let Fs = params.Fs
+    let Fc = params.Fc
+    let o = params.order
+    let omega = 2 * Math.PI * Fc / Fs
+    let dc = 0
+    let ret = []
     // sinc function is considered to be
     // the ideal impulse response
     // do an idft and use Hamming window afterwards
@@ -84,25 +84,25 @@ export default class FirCoeffs {
   // invert for highpass from lowpass
   static invert(h: number[]) {
     let cnt
-    for (cnt = 0; cnt < h.length; cnt++) {
+    for (let cnt = 0; cnt < h.length; cnt++) {
       h[cnt] = -h[cnt]
     }
     h[(h.length - 1) / 2]++
     return h
   }
   static bs(params: any) {
-    var lp = FirCoeffs.calcImpulseResponse({
+    let lp = FirCoeffs.calcImpulseResponse({
       order: params.order,
       Fs: params.Fs,
       Fc: params.F2
     } as FirParams)
-    var hp = FirCoeffs.invert(FirCoeffs.calcImpulseResponse({
+    let hp = FirCoeffs.invert(FirCoeffs.calcImpulseResponse({
       order: params.order,
       Fs: params.Fs,
       Fc: params.F1
     } as FirParams))
-    var out = []
-    for (var i = 0; i < lp.length; i++) {
+    let out = []
+    for (let i = 0; i < lp.length; i++) {
       out.push(lp[i] + hp[i])
     }
     return out

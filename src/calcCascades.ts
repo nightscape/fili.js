@@ -1,8 +1,8 @@
 'use strict';
 import IirCoeffs from './iirCoeffs'
 
-var getCoeffs = new IirCoeffs();
-var table: { bessel: { [key: string] : number[][]}} = {
+let getCoeffs = new IirCoeffs();
+let table: { bessel: { [key: string] : number[][]}} = {
     // values from https://gist.github.com/endolith/4982787#file-all-values-txt
     bessel: {
         q: [
@@ -55,7 +55,7 @@ interface ValTable {
     bs: number[][]
 }
 // from Texas Instruments "Op Amps for Everyone" Chapter 16 "Active Filter Design Techniques"
-var tiTable: {[key: string]: ValTable} = {
+let tiTable: {[key: string]: ValTable} = {
     bessel: {
         as: [
             [1.3617],
@@ -169,15 +169,15 @@ var tiTable: {[key: string]: ValTable} = {
         ]
     }
 };
-var calcCoeffs = function (params: any, behavior: any) {
-    var filter = [];
+let calcCoeffs = function (params: any, behavior: any) {
+    let filter = [];
     let cnt = 0;
     if (behavior !== 'fromPZ') {
         if (params.order > 12) {
             params.order = 12;
         }
-        for (cnt = 0; cnt < params.order; cnt++) {
-            var q, f, fd;
+        for (let cnt = 0; cnt < params.order; cnt++) {
+            let q, f, fd;
             if (params.transform === 'matchedZ') {
                 filter.push(getCoeffs['lowpassMZ']({
                     Fs: params.Fs,
@@ -229,13 +229,13 @@ var calcCoeffs = function (params: any, behavior: any) {
         }
     }
     else {
-        for (cnt = 0; cnt < params.length; cnt++) {
+        for (let cnt = 0; cnt < params.length; cnt++) {
             filter.push(getCoeffs[behavior](params[cnt]));
         }
     }
     return filter;
 };
-var initCalcCoeffs = function (behavior: any) {
+let initCalcCoeffs = function (behavior: any) {
     return function (params: any) {
         return calcCoeffs(params, behavior);
     };
@@ -245,7 +245,7 @@ export default class CalcCascades {
     [key: string]: any
     available: any = []
     constructor() {
-    for (var k in getCoeffs) {
+    for (let k in getCoeffs) {
         this[k] = initCalcCoeffs(k);
         this.available.push(k);
     }
