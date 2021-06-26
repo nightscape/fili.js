@@ -10,19 +10,19 @@ var FirFilter = require('../src/firFilter')
 describe('iir.js', function () {
   var firCalculator: any
 
-  
+
   before(function () {
-    
+
     firCalculator = new FirCoeffs()
   })
 
-  
-  after(function () {})
 
-  
+  after(function () { })
+
+
   describe('fir-lp', function () {
     var filterCoeffs: any, filter: any
-    
+
     it('can calculate coeffs', function () {
       filterCoeffs = firCalculator.lowpass({
         order: 100,
@@ -34,21 +34,21 @@ describe('iir.js', function () {
       filterCoeffs.length.should.equal(101)
     })
 
-    
+
     it('can generate a filter', function () {
-      
+
       filter = new FirFilter(filterCoeffs)
       filter.should.be.an.Object
     })
 
-    
+
     it('can do a single step', function () {
       var out = filter.singleStep(10)
       out.should.be.a.Number
       out.should.not.equal(0)
     })
 
-    
+
     it('can do multiple steps', function () {
       var simInput = []
       for (var i = 0; i < 10000; i++) {
@@ -60,7 +60,7 @@ describe('iir.js', function () {
       out[111].should.not.equal(simInput[111])
     })
 
-    
+
     it('can simulate multiple steps', function () {
       var simInput = []
       for (var i = 0; i < 10000; i++) {
@@ -72,7 +72,7 @@ describe('iir.js', function () {
       out[111].should.not.equal(simInput[111])
     })
 
-    
+
     it('calculates filter response', function () {
       var r = filter.response(200)
       r.should.be.an.Array
@@ -93,16 +93,16 @@ describe('iir.js', function () {
       r[20].groupDelay.should.not.equal(0)
     })
 
-    
+
     it('reinit does not crash', function () {
       filter.reinit()
     })
   })
 
-  
+
   describe('fir-hp', function () {
     var filterCoeffs: any, filter: any
-    
+
     it('can calculate coeffs', function () {
       filterCoeffs = firCalculator.highpass({
         order: 100,
@@ -114,21 +114,21 @@ describe('iir.js', function () {
       filterCoeffs.length.should.equal(101)
     })
 
-    
+
     it('can generate a filter', function () {
-      
+
       filter = new FirFilter(filterCoeffs)
       filter.should.be.an.Object
     })
 
-    
+
     it('can do a single step', function () {
       var out = filter.singleStep(10)
       out.should.be.a.Number
       out.should.not.equal(0)
     })
 
-    
+
     it('can do multiple steps', function () {
       var simInput = []
       for (var i = 0; i < 10000; i++) {
@@ -140,7 +140,7 @@ describe('iir.js', function () {
       out[111].should.not.equal(simInput[111])
     })
 
-    
+
     it('can simulate multiple steps', function () {
       var simInput = []
       for (var i = 0; i < 10000; i++) {
@@ -152,7 +152,7 @@ describe('iir.js', function () {
       out[111].should.not.equal(simInput[111])
     })
 
-    
+
     it('calculates filter response', function () {
       var r = filter.response(200)
       r.should.be.an.Array
@@ -173,16 +173,16 @@ describe('iir.js', function () {
       r[20].groupDelay.should.not.equal(0)
     })
 
-    
+
     it('reinit does not crash', function () {
       filter.reinit()
     })
   })
 
-  
-  describe('fir-br', function () {
+
+  describe('fir-br', () => {
     var filterCoeffs: any, filter: any
-    
+
     it('can calculate coeffs', function () {
       filterCoeffs = firCalculator.bandstop({
         order: 100,
@@ -195,21 +195,21 @@ describe('iir.js', function () {
       filterCoeffs.length.should.equal(101)
     })
 
-    
+
     it('can generate a filter', function () {
-      
+
       filter = new FirFilter(filterCoeffs)
       filter.should.be.an.Object
     })
 
-    
+
     it('can do a single step', function () {
       var out = filter.singleStep(10)
       out.should.be.a.Number
       out.should.not.equal(0)
     })
 
-    
+
     it('can do multiple steps', function () {
       var simInput = []
       for (var i = 0; i < 10000; i++) {
@@ -221,7 +221,7 @@ describe('iir.js', function () {
       out[111].should.not.equal(simInput[111])
     })
 
-    
+
     it('can simulate multiple steps', function () {
       var simInput = []
       for (var i = 0; i < 10000; i++) {
@@ -233,7 +233,7 @@ describe('iir.js', function () {
       out[111].should.not.equal(simInput[111])
     })
 
-    
+
     it('calculates filter response', function () {
       var r = filter.response(200)
       r.should.be.an.Array
@@ -254,16 +254,16 @@ describe('iir.js', function () {
       r[20].groupDelay.should.not.equal(0)
     })
 
-    
+
     it('reinit does not crash', function () {
       filter.reinit()
     })
   })
 
-  
+
   describe('fir-bp', function () {
     var filterCoeffs: any, filter: any
-    
+
     it('can calculate coeffs', function () {
       filterCoeffs = firCalculator.bandpass({
         order: 100,
@@ -276,21 +276,21 @@ describe('iir.js', function () {
       filterCoeffs.length.should.equal(101)
     })
 
-    
+
     it('can generate a filter', function () {
-      
+
       filter = new FirFilter(filterCoeffs)
       filter.should.be.an.Object
     })
 
-    
+
     it('can do a single step', function () {
       var out = filter.singleStep(10)
       out.should.be.a.Number
       out.should.not.equal(0)
     })
 
-    
+
     it('can do multiple steps', function () {
       var simInput = []
       for (var i = 0; i < 10000; i++) {
@@ -302,7 +302,7 @@ describe('iir.js', function () {
       out[111].should.not.equal(simInput[111])
     })
 
-    
+
     it('can simulate multiple steps', function () {
       var simInput = []
       for (var i = 0; i < 10000; i++) {
@@ -314,7 +314,7 @@ describe('iir.js', function () {
       out[111].should.not.equal(simInput[111])
     })
 
-    
+
     it('calculates filter response', function () {
       var r = filter.response(200)
       r.should.be.an.Array
@@ -335,10 +335,10 @@ describe('iir.js', function () {
       r[20].groupDelay.should.not.equal(0)
     })
 
-    
+
     describe('fir-kb-bp', function () {
       var filterCoeffs: any, filter: any
-      
+
       it('can calculate coeffs', function () {
         filterCoeffs = firCalculator.kbFilter({
           order: 101,
@@ -352,21 +352,21 @@ describe('iir.js', function () {
         filterCoeffs.length.should.equal(101)
       })
 
-      
+
       it('can generate a filter', function () {
-        
+
         filter = new FirFilter(filterCoeffs)
         filter.should.be.an.Object
       })
 
-      
+
       it('can do a single step', function () {
         var out = filter.singleStep(10)
         out.should.be.a.Number
         out.should.not.equal(0)
       })
 
-      
+
       it('can do multiple steps', function () {
         var simInput = []
         for (var i = 0; i < 10000; i++) {
@@ -378,7 +378,7 @@ describe('iir.js', function () {
         out[111].should.not.equal(simInput[111])
       })
 
-      
+
       it('can simulate multiple steps', function () {
         var simInput = []
         for (var i = 0; i < 10000; i++) {
@@ -390,7 +390,7 @@ describe('iir.js', function () {
         out[111].should.not.equal(simInput[111])
       })
 
-      
+
       it('calculates filter response', function () {
         var r = filter.response(200)
         r.should.be.an.Array
@@ -412,15 +412,15 @@ describe('iir.js', function () {
       })
     })
 
-    
+
     it('reinit does not crash', function () {
       filter.reinit()
     })
   })
 
-  
+
   describe('fir-helpers', function () {
-    
+
     it('can get available filters', function () {
       var av = firCalculator.available()
       av.length.should.not.equal(0)
