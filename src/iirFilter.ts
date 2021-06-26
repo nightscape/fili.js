@@ -14,7 +14,7 @@ export default class IirFilter {
     constructor(filter: any) {
         this.f = filter;
 
-        for (var cnt = 0; cnt < this.f.length; cnt++) {
+        for (let cnt = 0; cnt < this.f.length; cnt++) {
             this.cf[cnt] = {};
             var s = this.f[cnt];
             this.cf[cnt].b0 = {
@@ -58,7 +58,7 @@ export default class IirFilter {
     }
     doStep(input: any, coeffs: any) {
         var out = input;
-        var cnt = 0;
+        let cnt = 0;
         for (cnt = 0; cnt < coeffs.length; cnt++) {
             out = this.runStage(coeffs[cnt], out);
         }
@@ -86,7 +86,7 @@ export default class IirFilter {
         return res;
     }
     calcResponse(params: any) {
-        var cnt = 0;
+        let cnt = 0;
         var res = {
             magnitude: 1,
             phase: 0,
@@ -105,7 +105,7 @@ export default class IirFilter {
     }
     reinit() {
         var tempF = [];
-        for (var cnt = 0; cnt < this.f.length; cnt++) {
+        for (let cnt = 0; cnt < this.f.length; cnt++) {
             var s = this.f[cnt];
             tempF[cnt] = {
                 b0: {
@@ -144,7 +144,7 @@ export default class IirFilter {
     predefinedResponse(def: any, length: any) {
         var ret = {};
         var input = [];
-        var cnt = 0;
+        let cnt = 0;
         for (cnt = 0; cnt < length; cnt++) {
             input.push(def(cnt));
         }
@@ -193,7 +193,7 @@ export default class IirFilter {
     };
     getPZ() {
         var res = [];
-        for (var cnt = 0; cnt < this.cc.length; cnt++) {
+        for (let cnt = 0; cnt < this.cc.length; cnt++) {
             res[cnt] = {};
             (res[cnt] as any).z = this.getComplRes(this.cc[cnt].b1, this.cc[cnt].b2);
             (res[cnt] as any).p = this.getComplRes(this.cc[cnt].a1, this.cc[cnt].a2);
@@ -233,7 +233,7 @@ export default class IirFilter {
     response(resolution: any) {
         resolution = resolution || 100;
         var res = [];
-        var cnt = 0;
+        let cnt = 0;
         var r = resolution * 2;
         for (cnt = 0; cnt < resolution; cnt++) {
             res[cnt] = this.calcResponse({
@@ -248,7 +248,7 @@ export default class IirFilter {
         return this.getPZ();
     }
     reInit() {
-        var cnt = 0
+        let cnt = 0
         for (cnt = 0; cnt < this.cf.length; cnt++) {
             this.cf[cnt].z = [0, 0];
         }

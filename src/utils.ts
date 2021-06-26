@@ -6,7 +6,7 @@
 
 exports.evaluatePhase = function (res: any) {
   var xcnt = 0
-  var cnt = 0
+  let cnt = 0
   var pi = Math.PI
   var tpi = 2 * pi
   var phase = []
@@ -111,7 +111,7 @@ exports.besselFactors = function (n: any) {
 
 var fractionToFp = function (fraction: any, fractionBits: any) {
   var fpFraction = 0
-  for (var cnt = 0; cnt < fractionBits; cnt++) {
+  for (let cnt = 0; cnt < fractionBits; cnt++) {
     var bitVal = 1 / Math.pow(2, cnt + 1)
     if (fraction > bitVal) {
       fraction -= bitVal

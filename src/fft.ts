@@ -465,21 +465,21 @@ export default class Fft {
     }
     magnitude(params: any) {
         var ret = [];
-        for (var cnt = 0; cnt < params.re.length; cnt++) {
+        for (let cnt = 0; cnt < params.re.length; cnt++) {
             ret.push(Math.sqrt(params.re[cnt] * params.re[cnt] + params.im[cnt] * params.im[cnt]));
         }
         return ret;
     }
     magToDb(b: any) {
         var ret = [];
-        for (var cnt = 0; cnt < b.length; cnt++) {
+        for (let cnt = 0; cnt < b.length; cnt++) {
             ret.push(20 * Math.log(b[cnt]) * Math.LOG10E);
         }
         return ret;
     }
     phase(params: any) {
         var ret = [];
-        for (var cnt = 0; cnt < params.re.length; cnt++) {
+        for (let cnt = 0; cnt < params.re.length; cnt++) {
             ret.push(Math.atan2(params.im[cnt], params.re[cnt]));
         }
         return ret;

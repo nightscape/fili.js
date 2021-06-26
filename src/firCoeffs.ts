@@ -26,14 +26,12 @@ export default class FirCoeffs {
       o++
     }
     var Np = (o - 1) / 2
-    var A = []
+    var A: number[] = []
     var beta = 0
-    var cnt = 0
-    var inoBeta
-    var ret = []
+    var ret: number[] = []
 
     A[0] = 2 * (Fb - Fa) / Fs
-    for (cnt = 1; cnt <= Np; cnt++) {
+    for (let cnt = 1; cnt <= Np; cnt++) {
       A[cnt] = (Math.sin(2 * cnt * Math.PI * Fb / Fs) - Math.sin(2 * cnt * Math.PI * Fa / Fs)) / (cnt * Math.PI)
     }
     // empirical coefficients
@@ -45,11 +43,11 @@ export default class FirCoeffs {
       beta = 0.5842 * Math.pow((alpha - 21), 0.4) + 0.07886 * (alpha - 21)
     }
 
-    inoBeta = ino(beta)
-    for (cnt = 0; cnt <= Np; cnt++) {
+    var inoBeta = ino(beta)
+    for (let cnt = 0; cnt <= Np; cnt++) {
       ret[Np + cnt] = A[cnt] * ino(beta * Math.sqrt(1 - (cnt * cnt / (Np * Np)))) / inoBeta
     }
-    for (cnt = 0; cnt < Np; cnt++) {
+    for (let cnt = 0; cnt < Np; cnt++) {
       ret[cnt] = ret[o - 1 - cnt]
     }
     return ret
@@ -62,13 +60,12 @@ export default class FirCoeffs {
     var Fc = params.Fc
     var o = params.order
     var omega = 2 * Math.PI * Fc / Fs
-    var cnt = 0
     var dc = 0
     var ret = []
     // sinc function is considered to be
     // the ideal impulse response
     // do an idft and use Hamming window afterwards
-    for (cnt = 0; cnt <= o; cnt++) {
+    for (let cnt = 0; cnt <= o; cnt++) {
       if (cnt - o / 2 === 0) {
         ret[cnt] = omega
       } else {
@@ -79,14 +76,14 @@ export default class FirCoeffs {
       dc = dc + ret[cnt]
     }
     // normalize
-    for (cnt = 0; cnt <= o; cnt++) {
+    for (let cnt = 0; cnt <= o; cnt++) {
       ret[cnt] /= dc
     }
     return ret
   }
   // invert for highpass from lowpass
-  static invert(h: any) {
-    var cnt
+  static invert(h: number[]) {
+    let cnt
     for (cnt = 0; cnt < h.length; cnt++) {
       h[cnt] = -h[cnt]
     }

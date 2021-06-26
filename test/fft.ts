@@ -12,7 +12,7 @@ describe('fft.js', () => {
   
   before(function () {
     fftCalc = new Fft(8192)
-    for (var cnt = 0; cnt < 8192; cnt++) {
+    for (let cnt = 0; cnt < 8192; cnt++) {
       sinewave.push(Math.sin(2 * Math.PI * (113.33232 * cnt / 8192)))
     }
   })

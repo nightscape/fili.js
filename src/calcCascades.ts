@@ -171,7 +171,7 @@ var tiTable: {[key: string]: ValTable} = {
 };
 var calcCoeffs = function (params: any, behavior: any) {
     var filter = [];
-    var cnt = 0;
+    let cnt = 0;
     if (behavior !== 'fromPZ') {
         if (params.order > 12) {
             params.order = 12;

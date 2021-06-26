@@ -14,7 +14,7 @@ export default class TestFilter {
 
 
   randomValues(params: any) {
-    for (var cnt = 0; cnt < params.steps; cnt++) {
+    for (let cnt = 0; cnt < params.steps; cnt++) {
       this.simData.push(this.f.singleStep(((Math.random() - 0.5) * params.pp) + params.offset))
     }
   }
@@ -22,7 +22,7 @@ export default class TestFilter {
   stepValues(params: any) {
     var max = params.offset + params.pp
     var min = params.offset - params.pp
-    for (var cnt = 0; cnt < params.steps; cnt++) {
+    for (let cnt = 0; cnt < params.steps; cnt++) {
       if ((cnt % 200) < 100) {
         this.simData.push(this.f.singleStep(max))
       } else {
@@ -34,7 +34,7 @@ export default class TestFilter {
   impulseValues(params: any) {
     var max = params.offset + params.pp
     var min = params.offset - params.pp
-    for (var cnt = 0; cnt < params.steps; cnt++) {
+    for (let cnt = 0; cnt < params.steps; cnt++) {
       if (cnt % 100 === 0) {
         this.simData.push(this.f.singleStep(max))
       } else {
@@ -48,7 +48,7 @@ export default class TestFilter {
     var min = params.offset - params.pp
     var val = min
     var diff = (max - min) / 100
-    for (var cnt = 0; cnt < params.steps; cnt++) {
+    for (let cnt = 0; cnt < params.steps; cnt++) {
       if (cnt % 200 < 100) {
         val += diff
       } else {
@@ -62,7 +62,7 @@ export default class TestFilter {
     this.f.reinit()
     this.simData.length = 0
     this.randomValues(params)
-    for (var cnt = params.setup; cnt < this.simData.length; cnt++) {
+    for (let cnt = params.setup; cnt < this.simData.length; cnt++) {
       if (this.simData[cnt] > params.maxStable || this.simData[cnt] < params.minStable) {
         return this.simData[cnt]
       }
@@ -86,7 +86,7 @@ export default class TestFilter {
       }
     }
     this.randomValues(params)
-    for (var cnt = params.setup; cnt < this.simData.length; cnt++) {
+    for (let cnt = params.setup; cnt < this.simData.length; cnt++) {
       if (this.simData[cnt] > params.maxStable || this.simData[cnt] < params.minStable) {
         return this.simData[cnt]
       }
