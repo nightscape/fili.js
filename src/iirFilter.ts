@@ -1,6 +1,6 @@
 'use strict';
 
-let { complex, runMultiFilter, runMultiFilterReverse, evaluatePhase } = require('./utils');
+import { complex, runMultiFilter, runMultiFilterReverse, evaluatePhase } from './utils'
 // params: array of biquad coefficient objects and z registers
 // stage structure e.g. {k:1, a:[1.1, -1.2], b:[0.3, -1.2, -0.4], z:[0, 0]}
 export default class IirFilter {

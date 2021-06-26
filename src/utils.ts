@@ -4,7 +4,7 @@
  * Evaluate phase
  */
 
-exports.evaluatePhase = function (res: any) {
+export function evaluatePhase (res: any) {
   let xcnt = 0
   let cnt = 0
   let pi = Math.PI
@@ -54,7 +54,7 @@ exports.evaluatePhase = function (res: any) {
  * Run multi filter
  */
 
-exports.runMultiFilter = function (input: any, d: any, doStep: any, overwrite: any) {
+export function runMultiFilter (input: any, d: any, doStep: any, overwrite: boolean = false) {
   let out = []
   if (overwrite) {
     out = input
@@ -66,7 +66,7 @@ exports.runMultiFilter = function (input: any, d: any, doStep: any, overwrite: a
 }
 
 
-exports.runMultiFilterReverse = function (input: any, d: any, doStep: any, overwrite: any) {
+export function runMultiFilterReverse (input: any, d: any, doStep: any, overwrite: any) {
   let out = []
   if (overwrite) {
     out = input
@@ -97,7 +97,7 @@ let factorial = function (n: any, a: any? = null) {
  * Bessel factors
  */
 
-exports.besselFactors = function (n: any) {
+export function besselFactors (n: any) {
   let res = []
   for (let k = 0; k < n + 1; k++) {
     
@@ -156,7 +156,7 @@ exports.fixedPoint = {
  * Complex
  */
 
-exports.complex = {
+export let complex = {
 
   div: function (p: any, q: any) {
     let a = p.re

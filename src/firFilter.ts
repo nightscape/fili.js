@@ -2,13 +2,13 @@
 
 import Complex from "./complex"
 
-let {
+import {
   runMultiFilter,
   runMultiFilterReverse,
   complex,
   evaluatePhase
 
-} = require('./utils')
+} from './utils'
 
 /**
  * Fir filter
