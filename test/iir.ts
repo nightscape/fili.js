@@ -2,7 +2,7 @@
 
 require('should')
 
-var CalcCascades = require('../src/calcCascades')
+import CalcCascades from '../src/calcCascades'
 
 import IirFilter from '../src/iirFilter'
 
@@ -1173,7 +1173,7 @@ describe('iir.js', function () {
   describe('iir-helpers', function () {
     
     it('can get available filters', function () {
-      var av = iirCascadeCalculator.available()
+      var av = iirCascadeCalculator.available
       av.length.should.not.equal(0)
       av[1].should.be.a.String
     })

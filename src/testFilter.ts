@@ -3,99 +3,98 @@
 /**
  * Test filter
  */
-var TestFilter = function (filter: any) {
-  var f = filter
+export default class TestFilter {
 
-  var simData: any = []
-  var cnt
 
-  var randomValues = function (params: any) {
-    for (cnt = 0; cnt < params.steps; cnt++) {
-      simData.push(f.singleStep(((Math.random() - 0.5) * params.pp) + params.offset))
+  simData: any[] = []
+  f: any
+  constructor(filter: any) {
+    this.f = filter
+  }
+
+
+  randomValues(params: any) {
+    for (var cnt = 0; cnt < params.steps; cnt++) {
+      this.simData.push(this.f.singleStep(((Math.random() - 0.5) * params.pp) + params.offset))
     }
   }
 
-  var stepValues = function (params: any) {
+  stepValues(params: any) {
     var max = params.offset + params.pp
     var min = params.offset - params.pp
-    for (cnt = 0; cnt < params.steps; cnt++) {
+    for (var cnt = 0; cnt < params.steps; cnt++) {
       if ((cnt % 200) < 100) {
-        simData.push(f.singleStep(max))
+        this.simData.push(this.f.singleStep(max))
       } else {
-        simData.push(f.singleStep(min))
+        this.simData.push(this.f.singleStep(min))
       }
     }
   }
 
-  var impulseValues = function (params: any) {
+  impulseValues(params: any) {
     var max = params.offset + params.pp
     var min = params.offset - params.pp
-    for (cnt = 0; cnt < params.steps; cnt++) {
+    for (var cnt = 0; cnt < params.steps; cnt++) {
       if (cnt % 100 === 0) {
-        simData.push(f.singleStep(max))
+        this.simData.push(this.f.singleStep(max))
       } else {
-        simData.push(f.singleStep(min))
+        this.simData.push(this.f.singleStep(min))
       }
     }
   }
 
-  var rampValues = function (params: any) {
+  rampValues(params: any) {
     var max = params.offset + params.pp
     var min = params.offset - params.pp
     var val = min
     var diff = (max - min) / 100
-    for (cnt = 0; cnt < params.steps; cnt++) {
+    for (var cnt = 0; cnt < params.steps; cnt++) {
       if (cnt % 200 < 100) {
         val += diff
       } else {
         val -= diff
       }
-      simData.push(f.singleStep(val))
+      this.simData.push(this.f.singleStep(val))
     }
   }
 
-  var self = {
-    randomStability: function (params: any) {
-      f.reinit()
-      simData.length = 0
-      randomValues(params)
-      for (cnt = params.setup; cnt < simData.length; cnt++) {
-        if (simData[cnt] > params.maxStable || simData[cnt] < params.minStable) {
-          return simData[cnt]
-        }
+  randomStability(params: any) {
+    this.f.reinit()
+    this.simData.length = 0
+    this.randomValues(params)
+    for (var cnt = params.setup; cnt < this.simData.length; cnt++) {
+      if (this.simData[cnt] > params.maxStable || this.simData[cnt] < params.minStable) {
+        return this.simData[cnt]
       }
-      return true
-    },
-    directedRandomStability: function (params: any) {
-      f.reinit()
-      simData.length = 0
-      var i
-      for (i = 0; i < params.tests; i++) {
-        var choose = Math.random()
-        if (choose < 0.25) {
-          randomValues(params)
-        } else if (choose < 0.5) {
-          stepValues(params)
-        } else if (choose < 0.75) {
-          impulseValues(params)
-        } else {
-          rampValues(params)
-        }
-      }
-      randomValues(params)
-      for (cnt = params.setup; cnt < simData.length; cnt++) {
-        if (simData[cnt] > params.maxStable || simData[cnt] < params.minStable) {
-          return simData[cnt]
-        }
-      }
-      return true
-    },
-    evaluateBehavior: function () {
-
     }
+    return true
   }
-  return self
+  directedRandomStability(params: any) {
+    this.f.reinit()
+    this.simData.length = 0
+    var i
+    for (i = 0; i < params.tests; i++) {
+      var choose = Math.random()
+      if (choose < 0.25) {
+        this.randomValues(params)
+      } else if (choose < 0.5) {
+        this.stepValues(params)
+      } else if (choose < 0.75) {
+        this.impulseValues(params)
+      } else {
+        this.rampValues(params)
+      }
+    }
+    this.randomValues(params)
+    for (var cnt = params.setup; cnt < this.simData.length; cnt++) {
+      if (this.simData[cnt] > params.maxStable || this.simData[cnt] < params.minStable) {
+        return this.simData[cnt]
+      }
+    }
+    return true
+  }
+  evaluateBehavior() {
+
+  }
 }
 
-
-module.exports = TestFilter

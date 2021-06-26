@@ -59,8 +59,7 @@ exports.runMultiFilter = function (input: any, d: any, doStep: any, overwrite: a
   if (overwrite) {
     out = input
   }
-  var i
-  for (i = 0; i < input.length; i++) {
+  for (var i = 0; i < input.length; i++) {
     out[i] = doStep(input[i], d)
   }
   return out

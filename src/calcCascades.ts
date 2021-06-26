@@ -242,17 +242,13 @@ var initCalcCoeffs = function (behavior: any) {
 };
 
 var self = {};
-var CalcCascades = function () {
-    var available: any = [];
+export default class CalcCascades {
+    [key: string]: any
+    available: any = []
+    constructor() {
     for (var k in getCoeffs) {
-        // @ts-expect-error ts-migrate(7015) FIXME: Element implicitly has an 'any' type because index... Remove this comment to see the full error message
-        self[k] = initCalcCoeffs(k);
-        available.push(k);
+        this[k] = initCalcCoeffs(k);
+        this.available.push(k);
     }
-    (self as any).available = function () {
-        return available;
-    };
-    return self;
-};
-
-module.exports = CalcCascades;
+}
+}
