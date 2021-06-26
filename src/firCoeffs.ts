@@ -1,10 +1,10 @@
 'use strict'
 
-var FirCoeffs = function () {
+export default class FirCoeffs {
   // Kaiser windowd filters
   // desired attenuation can be defined
   // better than windowd sinc filters
-  var calcKImpulseResponse = function (params: any) {
+  static calcKImpulseResponse(params: any) {
     var Fs = params.Fs
     var Fa = params.Fa
     var Fb = params.Fb
@@ -57,7 +57,7 @@ var FirCoeffs = function () {
 
   // note: coefficients are equal to impulse response
   // windowd sinc filter
-  var calcImpulseResponse = function (params: any) {
+  static calcImpulseResponse(params: any) {
     var Fs = params.Fs
     var Fc = params.Fc
     var o = params.order
@@ -85,7 +85,7 @@ var FirCoeffs = function () {
     return ret
   }
   // invert for highpass from lowpass
-  var invert = function (h: any) {
+  static invert(h: any) {
     var cnt
     for (cnt = 0; cnt < h.length; cnt++) {
       h[cnt] = -h[cnt]
@@ -93,13 +93,13 @@ var FirCoeffs = function () {
     h[(h.length - 1) / 2]++
     return h
   }
-  var bs = function (params: any) {
-    var lp = calcImpulseResponse({
+  static bs(params: any) {
+    var lp = FirCoeffs.calcImpulseResponse({
       order: params.order,
       Fs: params.Fs,
       Fc: params.F2
     })
-    var hp = invert(calcImpulseResponse({
+    var hp = FirCoeffs.invert(FirCoeffs.calcImpulseResponse({
       order: params.order,
       Fs: params.Fs,
       Fc: params.F1
@@ -110,28 +110,26 @@ var FirCoeffs = function () {
     }
     return out
   }
-  var self = {
-    lowpass: function (params: any) {
-      return calcImpulseResponse(params)
-    },
-    highpass: function (params: any) {
-      return invert(calcImpulseResponse(params))
-    },
-    bandstop: function (params: any) {
-      return bs(params)
-    },
-    bandpass: function (params: any) {
-      return invert(bs(params))
-    },
-    kbFilter: function (params: any) {
-      return calcKImpulseResponse(params)
-    },
-    available: function () {
-      return ['lowpass', 'highpass', 'bandstop', 'bandpass', 'kbFilter']
-    }
+
+  lowpass(params: any) {
+    return FirCoeffs.calcImpulseResponse(params)
   }
-  return self
+  highpass(params: any) {
+    return FirCoeffs.invert(FirCoeffs.calcImpulseResponse(params))
+  }
+  bandstop(params: any) {
+    return FirCoeffs.bs(params)
+  }
+  bandpass(params: any) {
+    return FirCoeffs.invert(FirCoeffs.bs(params))
+  }
+  kbFilter(params: any) {
+    return FirCoeffs.calcKImpulseResponse(params)
+  }
+  available() {
+    return ['lowpass', 'highpass', 'bandstop', 'bandpass', 'kbFilter']
+  }
 }
 
-// @ts-expect-error ts-migrate(2580) FIXME: Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
+
 module.exports = FirCoeffs

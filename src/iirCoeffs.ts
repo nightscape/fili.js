@@ -19,7 +19,7 @@ export default class IirCoeffs {
         var pre = {} as Coeffs;
         var w = 2 * Math.PI * Fc / Fs;
         if (params.BW) {
-            // @ts-expect-error ts-migrate(2550) FIXME: Property 'sinh' does not exist on type 'Math'. Do ... Remove this comment to see the full error message
+            
             pre.alpha = Math.sin(w) * Math.sinh(Math.log(2) / 2 * params.BW * w / Math.sin(w));
         }
         else {
@@ -274,5 +274,5 @@ export default class IirCoeffs {
         return coeffs;
     }
 };
-// @ts-expect-error ts-migrate(2580) FIXME: Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
+
 module.exports = IirCoeffs;

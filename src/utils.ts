@@ -3,7 +3,7 @@
 /**
  * Evaluate phase
  */
-// @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'exports'.
+
 exports.evaluatePhase = function (res: any) {
   var xcnt = 0
   var cnt = 0
@@ -53,7 +53,7 @@ exports.evaluatePhase = function (res: any) {
 /**
  * Run multi filter
  */
-// @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'exports'.
+
 exports.runMultiFilter = function (input: any, d: any, doStep: any, overwrite: any) {
   var out = []
   if (overwrite) {
@@ -66,7 +66,7 @@ exports.runMultiFilter = function (input: any, d: any, doStep: any, overwrite: a
   return out
 }
 
-// @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'exports'.
+
 exports.runMultiFilterReverse = function (input: any, d: any, doStep: any, overwrite: any) {
   var out = []
   if (overwrite) {
@@ -80,7 +80,7 @@ exports.runMultiFilterReverse = function (input: any, d: any, doStep: any, overw
 }
 
 // @ts-expect-error ts-migrate(7023) FIXME: 'factorial' implicitly has return type 'any' becau... Remove this comment to see the full error message
-var factorial = function (n: any, a: any) {
+var factorial = function (n: any, a: any? = null) {
   if (!a) {
     a = 1
   }
@@ -97,13 +97,13 @@ var factorial = function (n: any, a: any) {
 /**
  * Bessel factors
  */
-// @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'exports'.
+
 exports.besselFactors = function (n: any) {
   var res = []
   for (var k = 0; k < n + 1; k++) {
-    // @ts-expect-error ts-migrate(2554) FIXME: Expected 2 arguments, but got 1.
+    
     var p = factorial(2 * n - k)
-    // @ts-expect-error ts-migrate(2554) FIXME: Expected 2 arguments, but got 1.
+    
     var q = Math.pow(2, (n - k)) * factorial(k) * factorial(n - k)
     res.unshift(Math.floor(p / q))
   }
@@ -138,7 +138,7 @@ var valueToFp = function (value: any, numberBits: any, fractionBits: any) {
   return fpNumber
 }
 
-// @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'exports'.
+
 exports.fixedPoint = {
   convert: function (value: any, numberBits: any, fractionBits: any) {
     return valueToFp(value, numberBits, fractionBits)
@@ -156,7 +156,7 @@ exports.fixedPoint = {
 /**
  * Complex
  */
-// @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'exports'.
+
 exports.complex = {
 
   div: function (p: any, q: any) {

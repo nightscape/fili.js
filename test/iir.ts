@@ -1,15 +1,10 @@
-/* global it, describe, before, after */
-
 'use strict'
 
-/* eslint-disable no-unused-vars */
-// @ts-expect-error ts-migrate(2580) FIXME: Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-var should = require('should')
-/* eslint-enable no-unused-vars */
-// @ts-expect-error ts-migrate(2580) FIXME: Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
+require('should')
+
 var CalcCascades = require('../src/calcCascades')
-// @ts-expect-error ts-migrate(2580) FIXME: Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-var IirFilter = require('../src/iirFilter')
+
+import IirFilter from '../src/iirFilter'
 
 
 describe('iir.js', function () {
@@ -44,7 +39,7 @@ describe('iir.js', function () {
 
     
     it('can generate a filter', function () {
-      // @ts-expect-error ts-migrate(7009) FIXME: 'new' expression, whose target lacks a construct s... Remove this comment to see the full error message
+      
       filter = new IirFilter(filterCoeffs)
       filter.should.be.an.Object
     })
@@ -193,7 +188,7 @@ describe('iir.js', function () {
 
     
     it('can generate a filter', function () {
-      // @ts-expect-error ts-migrate(7009) FIXME: 'new' expression, whose target lacks a construct s... Remove this comment to see the full error message
+      
       filter = new IirFilter(filterCoeffs)
       filter.should.be.an.Object
     })
@@ -342,7 +337,7 @@ describe('iir.js', function () {
 
     
     it('can generate a filter', function () {
-      // @ts-expect-error ts-migrate(7009) FIXME: 'new' expression, whose target lacks a construct s... Remove this comment to see the full error message
+      
       filter = new IirFilter(filterCoeffs)
       filter.should.be.an.Object
     })
@@ -491,7 +486,7 @@ describe('iir.js', function () {
 
     
     it('can generate a filter', function () {
-      // @ts-expect-error ts-migrate(7009) FIXME: 'new' expression, whose target lacks a construct s... Remove this comment to see the full error message
+      
       filter = new IirFilter(filterCoeffs)
       filter.should.be.an.Object
     })
@@ -640,7 +635,7 @@ describe('iir.js', function () {
 
     
     it('can generate a filter', function () {
-      // @ts-expect-error ts-migrate(7009) FIXME: 'new' expression, whose target lacks a construct s... Remove this comment to see the full error message
+      
       filter = new IirFilter(filterCoeffs)
       filter.should.be.an.Object
     })
@@ -773,7 +768,7 @@ describe('iir.js', function () {
 
     
     it('can generate a filter', function () {
-      // @ts-expect-error ts-migrate(7009) FIXME: 'new' expression, whose target lacks a construct s... Remove this comment to see the full error message
+      
       filter = new IirFilter(filterCoeffs)
       filter.should.be.an.Object
     })

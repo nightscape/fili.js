@@ -4,22 +4,25 @@
   "main": "dist/fili.min.js",
   "author": "Florian Markert",
   "license": "MIT",
-  "dependencies": {},
   "devDependencies": {
+    "@types/chai": "^4.2.19",
+    "@types/mocha": "^8.2.2",
+    "@types/node": "^15.12.4",
+    "@types/should": "latest",
     "babel": "^5.5.8",
     "babelify": "^6.1.2",
     "bannerify": "^1.0.1",
     "browserify": "^10.2.4",
+    "chai": "^4.3.4",
     "envify": "^3.4.0",
     "istanbul": "^0.3.21",
-    "mocha": "^2.2.5",
-    "@types/mocha": "latest",
+    "mocha": "^2.5.3",
     "should": "^6.0.3",
-    "@types/should": "latest",
     "standard": "^8.5.0",
-    "uglify-js": "^2.4.23",
+    "ts-node": "^10.0.0",
     "tslint": "^6.1.3",
-    "typescript": "^4.2.4"
+    "typescript": "^4.2.4",
+    "uglify-js": "^2.4.23"
   },
   "scripts": {
     "test": "istanbul cover _mocha -- --compilers js:babel/register --recursive build/test"

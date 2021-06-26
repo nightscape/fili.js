@@ -2,7 +2,7 @@
 import IirCoeffs from './iirCoeffs'
 
 var getCoeffs = new IirCoeffs();
-var table = {
+var table: { bessel: { [key: string] : number[][]}} = {
     // values from https://gist.github.com/endolith/4982787#file-all-values-txt
     bessel: {
         q: [
@@ -49,8 +49,13 @@ var table = {
         ]
     }
 };
+
+interface ValTable {
+    as: number[][]
+    bs: number[][]
+}
 // from Texas Instruments "Op Amps for Everyone" Chapter 16 "Active Filter Design Techniques"
-var tiTable = {
+var tiTable: {[key: string]: ValTable} = {
     bessel: {
         as: [
             [1.3617],
@@ -178,9 +183,9 @@ var calcCoeffs = function (params: any, behavior: any) {
                     Fs: params.Fs,
                     Fc: params.Fc,
                     preGain: params.preGain,
-                    // @ts-expect-error ts-migrate(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
+                    
                     as: tiTable[params.characteristic].as[params.order - 1][cnt],
-                    // @ts-expect-error ts-migrate(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
+                    
                     bs: tiTable[params.characteristic].bs[params.order - 1][cnt]
                 }));
             }
@@ -190,15 +195,15 @@ var calcCoeffs = function (params: any, behavior: any) {
                     f = 1;
                 }
                 else {
-                    // @ts-expect-error ts-migrate(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
-                    q = table[params.characteristic].q[params.order - 1][cnt];
+                    
+                    q = table['bessel'].q[params.order - 1][cnt];
                     if (params.oneDb) {
-                        // @ts-expect-error ts-migrate(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
-                        f = table[params.characteristic].f1dB[params.order - 1][cnt];
+                        
+                        f = table['bessel'].f1dB[params.order - 1][cnt];
                     }
                     else {
-                        // @ts-expect-error ts-migrate(7053) FIXME: Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
-                        f = table[params.characteristic].f3dB[params.order - 1][cnt];
+                        
+                        f = table['bessel'].f3dB[params.order - 1][cnt];
                     }
                 }
                 if (behavior === 'highpass') {
@@ -249,5 +254,5 @@ var CalcCascades = function () {
     };
     return self;
 };
-// @ts-expect-error ts-migrate(2580) FIXME: Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
+
 module.exports = CalcCascades;
