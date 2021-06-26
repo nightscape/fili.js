@@ -30,7 +30,7 @@ export default class FirFilter {
     this.z = FirFilter.initZero(this.f.length - 1)
   }
 
-  static initZero(cnt: any) {
+  static initZero(cnt: number) {
     let r = []
     let i
     for (i = 0; i < cnt; i++) {
@@ -87,7 +87,7 @@ export default class FirFilter {
   responsePoint(params: any) {
     return this.calcResponse(params)
   }
-  response(resolution: any) {
+  response(resolution: number) {
     resolution = resolution || 100
     let res = []
     let cnt = 0

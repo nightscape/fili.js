@@ -1,5 +1,5 @@
 'use strict';
-import IirCoeffs from './iirCoeffs'
+import IirCoeffs, { IirParams } from './iirCoeffs'
 
 let getCoeffs = new IirCoeffs();
 let table: { bessel: { [key: string] : number[][]}} = {
@@ -169,7 +169,7 @@ let tiTable: {[key: string]: ValTable} = {
         ]
     }
 };
-let calcCoeffs = function (params: any, behavior: any) {
+let calcCoeffs = function (params: any, behavior: string) {
     let filter = [];
     let cnt = 0;
     if (behavior !== 'fromPZ') {
@@ -224,7 +224,7 @@ let calcCoeffs = function (params: any, behavior: any) {
                     BW: params.BW || 0,
                     gain: params.gain || 0,
                     preGain: params.preGain || false
-                }));
+                } as IirParams));
             }
         }
     }
