@@ -3,8 +3,7 @@
 require('should')
 
 import FirCoeffs from '../src/firCoeffs'
-
-var FirFilter = require('../src/firFilter')
+import FirFilter from '../src/firFilter'
 
 
 describe('iir.js', function () {

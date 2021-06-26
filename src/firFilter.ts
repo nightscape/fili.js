@@ -1,5 +1,7 @@
 'use strict'
 
+import Complex from "./complex"
+
 var {
   runMultiFilter,
   runMultiFilterReverse,
@@ -11,19 +13,24 @@ var {
 /**
  * Fir filter
  */
-var FirFilter = function (filter: any) {
-  // note: coefficients are equal to input response
-  var f = filter
-  var b: any = []
-  var cnt = 0
-  for (cnt = 0; cnt < f.length; cnt++) {
-    b[cnt] = {
-      re: f[cnt],
-      im: 0
+export default class FirFilter {
+  f: any
+  b: any[] = []
+  z: any
+  constructor(filter: any) {
+    this.f = filter
+    var cnt = 0
+    // note: coefficients are equal to input response
+    for (cnt = 0; cnt < this.f.length; cnt++) {
+      this.b[cnt] = {
+        re: this.f[cnt],
+        im: 0
+      } as Complex
     }
+    this.z = FirFilter.initZero(this.f.length - 1)
   }
 
-  var initZero = function (cnt: any) {
+  static initZero(cnt: any) {
     var r = []
     var i
     for (i = 0; i < cnt; i++) {
@@ -35,24 +42,23 @@ var FirFilter = function (filter: any) {
     }
   }
 
-  var z = initZero(f.length - 1)
-
-  var doStep = function (input: any, d: any) {
+  doStep(input: any, d: any) {
     d.buf[d.pointer] = input
     var out = 0
+    var cnt = 0
     for (cnt = 0; cnt < d.buf.length; cnt++) {
-      out += (f[cnt] * d.buf[(d.pointer + cnt) % d.buf.length])
+      out += (this.f[cnt] * d.buf[(d.pointer + cnt) % d.buf.length])
     }
     d.pointer = (d.pointer + 1) % (d.buf.length)
     return out
   }
 
-  var calcInputResponse = function (input: any) {
-    var tempF = initZero(f.length - 1)
-    return runMultiFilter(input, tempF, doStep)
+  calcInputResponse(input: any) {
+    var tempF = FirFilter.initZero(this.f.length - 1)
+    return runMultiFilter(input, tempF, (input: any, coeffs: any) => this.doStep(input, coeffs))
   }
 
-  var calcResponse = function (params: any) {
+  calcResponse(params: any) {
     var Fs = params.Fs
     var Fr = params.Fr
     // z = exp(j*omega*pi) = cos(omega*pi) + j*sin(omega*pi)
@@ -63,8 +69,8 @@ var FirFilter = function (filter: any) {
       re: 0,
       im: 0
     }
-    for (var i = 0; i < f.length - 1; i++) {
-      h = complex.add(h, complex.mul(b[i], {
+    for (var i = 0; i < this.f.length - 1; i++) {
+      h = complex.add(h, complex.mul(this.b[i], {
         re: Math.cos(theta * i),
         im: Math.sin(theta * i)
       }))
@@ -78,43 +84,38 @@ var FirFilter = function (filter: any) {
     return res
   }
 
-  var self = {
-    responsePoint: function (params: any) {
-      return calcResponse(params)
-    },
-    response: function (resolution: any) {
-      resolution = resolution || 100
-      var res = []
-      var cnt = 0
-      var r = resolution * 2
-      for (cnt = 0; cnt < resolution; cnt++) {
-        res[cnt] = calcResponse({
-          Fs: r,
-          Fr: cnt
-        })
-      }
-      evaluatePhase(res)
-      return res
-    },
-    simulate: function (input: any) {
-      return calcInputResponse(input)
-    },
-    singleStep: function (input: any) {
-      return doStep(input, z)
-    },
-    multiStep: function (input: any, overwrite: any) {
-      return runMultiFilter(input, z, doStep, overwrite)
-    },
-    filtfilt: function (input: any, overwrite: any) {
-      return runMultiFilterReverse(runMultiFilter(
-        input, z, doStep, overwrite), z, doStep, true)
-    },
-    reinit: function () {
-      z = initZero(f.length - 1)
-    }
+  responsePoint(params: any) {
+    return this.calcResponse(params)
   }
-  return self
+  response(resolution: any) {
+    resolution = resolution || 100
+    var res = []
+    var cnt = 0
+    var r = resolution * 2
+    for (cnt = 0; cnt < resolution; cnt++) {
+      res[cnt] = this.calcResponse({
+        Fs: r,
+        Fr: cnt
+      })
+    }
+    evaluatePhase(res)
+    return res
+  }
+  simulate(input: any) {
+    return this.calcInputResponse(input)
+  }
+  singleStep(input: any) {
+    return this.doStep(input, this.z)
+  }
+  multiStep(input: any, overwrite: any) {
+    return runMultiFilter(input, this.z, (input: any, coeffs: any) => this.doStep(input, coeffs), overwrite)
+  }
+  filtfilt(input: any, overwrite: any) {
+    return runMultiFilterReverse(runMultiFilter(
+      input, this.z, (input: any, coeffs: any) => this.doStep(input, coeffs), overwrite), this.z, (input: any, coeffs: any) => this.doStep(input, coeffs), true)
+  }
+  reinit() {
+    this.z = FirFilter.initZero(this.f.length - 1)
+  }
+
 }
-
-
-module.exports = FirFilter
