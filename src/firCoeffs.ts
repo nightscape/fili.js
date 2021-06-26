@@ -4,7 +4,7 @@ export default class FirCoeffs {
   // Kaiser windowd filters
   // desired attenuation can be defined
   // better than windowd sinc filters
-  static calcKImpulseResponse(params: any) {
+  static calcKImpulseResponse(params: FirParams) {
     var Fs = params.Fs
     var Fa = params.Fa
     var Fb = params.Fb
@@ -57,7 +57,7 @@ export default class FirCoeffs {
 
   // note: coefficients are equal to impulse response
   // windowd sinc filter
-  static calcImpulseResponse(params: any) {
+  static calcImpulseResponse(params: FirParams) {
     var Fs = params.Fs
     var Fc = params.Fc
     var o = params.order
@@ -98,12 +98,12 @@ export default class FirCoeffs {
       order: params.order,
       Fs: params.Fs,
       Fc: params.F2
-    })
+    } as FirParams)
     var hp = FirCoeffs.invert(FirCoeffs.calcImpulseResponse({
       order: params.order,
       Fs: params.Fs,
       Fc: params.F1
-    }))
+    } as FirParams))
     var out = []
     for (var i = 0; i < lp.length; i++) {
       out.push(lp[i] + hp[i])
@@ -131,5 +131,11 @@ export default class FirCoeffs {
   }
 }
 
-
-module.exports = FirCoeffs
+export interface FirParams {
+  order: number
+  Fa: number
+  Fb: number
+  Fc: number
+  Fs: number
+  Att: number
+}

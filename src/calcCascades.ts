@@ -241,7 +241,6 @@ var initCalcCoeffs = function (behavior: any) {
     };
 };
 
-var self = {};
 export default class CalcCascades {
     [key: string]: any
     available: any = []
