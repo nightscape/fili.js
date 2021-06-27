@@ -5,12 +5,10 @@ import Complex from './complex';
  * Evaluate phase
  */
 
-export function evaluatePhase(res: any) {
-  let xcnt = 0;
-  const cnt = 0;
+export function evaluatePhase(res: any[]) {
   const pi = Math.PI;
   const tpi = 2 * pi;
-  const phase = [];
+  const phase: number[] = [];
   for (let cnt = 0; cnt < res.length; cnt++) {
     phase.push(res[cnt].phase);
   }
@@ -20,11 +18,11 @@ export function evaluatePhase(res: any) {
   for (let cnt = 1; cnt < phase.length; cnt++) {
     const diff = phase[cnt] - phase[cnt - 1];
     if (diff > pi) {
-      for (xcnt = cnt; xcnt < phase.length; xcnt++) {
+      for (let xcnt = cnt; xcnt < phase.length; xcnt++) {
         phase[xcnt] -= tpi;
       }
     } else if (diff < -pi) {
-      for (xcnt = cnt; xcnt < phase.length; xcnt++) {
+      for (let xcnt = cnt; xcnt < phase.length; xcnt++) {
         phase[xcnt] += tpi;
       }
     }
@@ -58,12 +56,12 @@ export function evaluatePhase(res: any) {
  */
 
 export function runMultiFilter(
-  input: any,
+  input: number[],
   d: any,
-  doStep: any,
+  doStep: (input: number, d: any) => number,
   overwrite: boolean = false
-) {
-  let out = [];
+): number[] {
+  let out: number[] = [];
   if (overwrite) {
     out = input;
   }
@@ -74,12 +72,12 @@ export function runMultiFilter(
 }
 
 export function runMultiFilterReverse(
-  input: any,
+  input: number[],
   d: any,
-  doStep: any,
+  doStep: (input: number, d: any) => number,
   overwrite: any
-) {
-  let out = [];
+): number[] {
+  let out: number[] = [];
   if (overwrite) {
     out = input;
   }
@@ -90,8 +88,7 @@ export function runMultiFilterReverse(
   return out;
 }
 
-// @ts-expect-error ts-migrate(7023) FIXME: 'factorial' implicitly has return type 'any' becau... Remove this comment to see the full error message
-const factorial = function (n: any, a: ?any = null) {
+function factorial(n: number, a: number | null | undefined = null): number {
   if (!a) {
     a = 1;
   }
@@ -119,22 +116,6 @@ export function besselFactors(n: any) {
   }
   return res;
 }
-
-const fractionToFp = function (fraction: any, fractionBits: any) {
-  let fpFraction = 0;
-  for (let cnt = 0; cnt < fractionBits; cnt++) {
-    const bitVal = 1 / Math.pow(2, cnt + 1);
-    if (fraction > bitVal) {
-      fraction -= bitVal;
-      fpFraction += bitVal;
-    }
-  }
-  return fpFraction;
-};
-
-const numberToFp = function (number: any, numberBits: any) {
-  return number & Math.pow(2, numberBits);
-};
 
 /**
  * Complex
