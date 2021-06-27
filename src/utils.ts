@@ -136,28 +136,6 @@ const numberToFp = function (number: any, numberBits: any) {
   return number & Math.pow(2, numberBits);
 };
 
-const valueToFp = function (value: any, numberBits: any, fractionBits: any) {
-  const number = Math.abs(value);
-  const fraction = value - number;
-  const fpNumber = {
-    number: numberToFp(number, numberBits).toString(),
-    fraction: fractionToFp(fraction, fractionBits).toString(),
-    numberBits: numberBits,
-    fractionBits: fractionBits,
-  };
-  return fpNumber;
-};
-
-export const fixedPoint = {
-  convert: function (value: any, numberBits: any, fractionBits: any) {
-    return valueToFp(value, numberBits, fractionBits);
-  },
-  add: function (fpVal1: any, fpVal2: any) {},
-  sub: function (fpVal1: any, fpVal2: any) {},
-  mul: function (fpVal1: any, fpVal2: any) {},
-  div: function (fpVal1: any, fpVal2: any) {},
-};
-
 /**
  * Complex
  */
