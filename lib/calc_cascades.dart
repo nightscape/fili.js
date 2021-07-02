@@ -411,7 +411,7 @@ var tiTable = {
 List<Coeffs> calcCoeffs(IirParams iparams, String behavior) {
   List<Coeffs> filter = [];
   if (behavior != 'fromPZ') {
-    PZParams params = iparams as PZParams;
+    final params = iparams as FcFsParams;
     if (params.order > 12) {
       params.order = 12;
     }
@@ -426,11 +426,12 @@ List<Coeffs> calcCoeffs(IirParams iparams, String behavior) {
           characteristic: "", // TODO: Was not set
           Fs: params.Fs,
           Fc: params.Fc,
-          preGain: params.preGain,
+          preGain: (params as dynamic).preGain,
           as: tiTable[params.characteristic]!.as[params.order - 1][cnt],
           bs: tiTable[params.characteristic]!.bs[params.order - 1][cnt],
         )));
       } else {
+        final params = iparams; // as FcFsQPregainParams;
         if (params.characteristic == 'butterworth') {
           q = 0.5 / (sin((pi / (params.order * 2)) * (cnt + 0.5)));
           f = 1;
@@ -452,6 +453,12 @@ List<Coeffs> calcCoeffs(IirParams iparams, String behavior) {
             fd = sqrt(params.order) * fd / params.order;
           }
         }
+        double gain = 0.0;
+        bool preGain = false;
+        if (params is PreGain) {
+          gain = (params as PreGain).gain;
+          preGain = (params as PreGain).preGain;
+        }
         filter.add(getCoeffs[behavior]!(FcFsQPregainParams(
           order: 1, // TODO: Was not set
           characteristic: "", // TODO: Was not set
@@ -459,12 +466,14 @@ List<Coeffs> calcCoeffs(IirParams iparams, String behavior) {
           Fc: fd,
           Q: q,
 
-          gain: params.gain,
-          preGain: params.preGain, // TODO: Used to be false by default
+          gain: gain,
+          preGain: preGain,
         )));
       }
     }
   } else {
+    PZParams pzparams = iparams as PZParams;
+
     /* TODO: Figure out why it is accessed like an array here
         for (var cnt = 0; cnt < params.length; cnt++) {
             filter.add(getCoeffs[behavior](params[cnt]));

@@ -10,35 +10,34 @@ import 'utils.dart';
 // params: array of biquad coefficient objects and z registers
 // stage structure e.g. {k:1, a:[1.1, -1.2], b:[0.3, -1.2, -0.4], z:[0, 0]}
 class IirFilter implements Filter {
-  List<TempF> cf = [];
-  List<CC> cc = [];
+  List<TempF> cf;
+  List<CC> cc;
   Complex cone = Complex(
     1,
     0,
   );
   late List<Coeffs> f;
-  IirFilter(List<Coeffs> filter) {
-    this.f = filter;
-
-    for (var cnt = 0; cnt < this.f.length; cnt++) {
-      var s = this.f[cnt];
-      this.cf[cnt] = TempF(
-        b0: Complex(s.b[0], 0),
-        b1: Complex(s.b[1], 0),
-        b2: Complex(s.b[2], 0),
-        a1: Complex(s.a[0], 0),
-        a2: Complex(s.a[1], 0),
-        k: Complex(s.k, 0),
-        z: [0, 0],
-      );
-      this.cc[cnt] = CC(
-        b1: s.b[1] / s.b[0],
-        b2: s.b[2] / s.b[0],
-        a1: s.a[0],
-        a2: s.a[1],
-      );
-    }
-  }
+  IirFilter(List<Coeffs> filter)
+      : f = filter,
+        cf = List.generate(
+            filter.length,
+            (cnt) => TempF(
+                  b0: Complex(filter[cnt].b[0], 0),
+                  b1: Complex(filter[cnt].b[1], 0),
+                  b2: Complex(filter[cnt].b[2], 0),
+                  a1: Complex(filter[cnt].a[0], 0),
+                  a2: Complex(filter[cnt].a[1], 0),
+                  k: Complex(filter[cnt].k, 0),
+                  z: [0, 0],
+                )),
+        cc = List.generate(
+            filter.length,
+            (cnt) => CC(
+                  b1: filter[cnt].b[1] / filter[cnt].b[0],
+                  b2: filter[cnt].b[2] / filter[cnt].b[0],
+                  a1: filter[cnt].a[0],
+                  a2: filter[cnt].a[1],
+                ));
 
   runStage(TempF s, double input) {
     var temp = input * s.k.re - s.a1.re * s.z[0] - s.a2.re * s.z[1];
@@ -68,10 +67,7 @@ class IirFilter implements Filter {
     var p = s.k.mul(s.b0.add(z.mul(s.b1.add(s.b2.mul(z)))));
     var q = this.cone.add(z.mul(s.a1.add(s.a2.mul(z))));
     var h = p.div(q);
-    var res = {
-      "magnitude": h.magnitude(),
-      "phase": h.phase(),
-    };
+    var res = MagnitudePhase(magnitude: h.magnitude(), phase: h.phase());
     return res;
   }
 
@@ -94,19 +90,17 @@ class IirFilter implements Filter {
   }
 
   reinit() {
-    var tempF = [];
-    for (var cnt = 0; cnt < this.f.length; cnt++) {
-      var s = this.f[cnt];
-      tempF[cnt] = TempF(
-        b0: Complex(s.b[0], 0),
-        b1: Complex(s.b[1], 0),
-        b2: Complex(s.b[2], 0),
-        a1: Complex(s.a[0], 0),
-        a2: Complex(s.a[1], 0),
-        k: Complex(s.k, 0),
-        z: [0, 0],
-      );
-    }
+    var tempF = List.generate(
+        this.f.length,
+        (cnt) => TempF(
+              b0: Complex(this.f[cnt].b[0], 0),
+              b1: Complex(this.f[cnt].b[1], 0),
+              b2: Complex(this.f[cnt].b[2], 0),
+              a1: Complex(this.f[cnt].a[0], 0),
+              a2: Complex(this.f[cnt].a[1], 0),
+              k: Complex(this.f[cnt].k, 0),
+              z: [0, 0],
+            ));
     return tempF;
   }
 
@@ -116,7 +110,7 @@ class IirFilter implements Filter {
         input, tempF, (input, coeffs) => this.doStep(input, coeffs));
   }
 
-  predefinedResponse(dynamic def, int length) {
+  predefinedResponse(double Function(int) def, int length) {
     List<double> input = [];
     for (var cnt = 0; cnt < length; cnt++) {
       input.add(def(cnt));
@@ -198,17 +192,15 @@ class IirFilter implements Filter {
   }
 
   stepResponse(int length) {
-    return this.predefinedResponse(() {
-      return 1;
-    }, length);
+    return this.predefinedResponse((_) => 1.0, length);
   }
 
   impulseResponse(int length) {
     return this.predefinedResponse((val) {
       if (val == 0) {
-        return 1;
+        return 1.0;
       } else {
-        return 0;
+        return 0.0;
       }
     }, length);
   }
@@ -218,14 +210,13 @@ class IirFilter implements Filter {
   }
 
   response({int resolution = 100}) {
-    var res = [];
     var r = resolution * 2;
-    for (var cnt = 0; cnt < resolution; cnt++) {
-      res[cnt] = this.calcResponse(FrFsParams(
-        Fs: r.toDouble(),
-        Fr: cnt.toDouble(),
-      ));
-    }
+    var res = List.generate(
+        resolution,
+        (cnt) => this.calcResponse(FrFsParams(
+              Fs: r.toDouble(),
+              Fr: cnt.toDouble(),
+            )));
     evaluatePhase(res);
     return res;
   }
@@ -290,4 +281,10 @@ class CC {
     required this.b1,
     required this.b2,
   });
+}
+
+class MagnitudePhase {
+  double magnitude;
+  double phase;
+  MagnitudePhase({required this.magnitude, required this.phase});
 }

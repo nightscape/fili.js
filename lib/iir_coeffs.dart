@@ -4,6 +4,7 @@ import 'complex.dart';
 import 'math_ext.dart';
 
 class Coeffs {
+  static const List<double> emptyList = [];
   double a0;
   List<double> a;
   List<double> b;
@@ -15,16 +16,16 @@ class Coeffs {
   double wp2;
   List<double> z;
   Coeffs({
-    required this.a0,
-    required this.a,
-    required this.b,
-    required this.k,
-    required this.alpha,
-    required this.cw,
-    required this.A,
-    required this.wp,
-    required this.wp2,
-    required this.z,
+    this.a0 = 0.0,
+    this.a = emptyList,
+    this.b = emptyList,
+    this.z = emptyList,
+    this.k = 0.0,
+    this.alpha = 0.0,
+    this.cw = 0.0,
+    this.A = 0.0,
+    this.wp = 0.0,
+    this.wp2 = 0.0,
   });
 }
 
@@ -32,14 +33,16 @@ class IirCoeffs extends MapBase<String, Coeffs Function(IirParams)> {
   static preCalc(FcFsQParams params, dynamic coeffs) {
     var Fc = params.Fc;
     var Fs = params.Fs;
-    var pre = {} as Coeffs;
     var w = 2 * pi * Fc / Fs;
-    pre.alpha = sin(w) / (2 * params.Q);
-    pre.cw = cos(w);
-    pre.a0 = 1 + pre.alpha;
+    final alpha = sin(w) / (2 * params.Q);
+    var pre = Coeffs(
+      alpha: alpha,
+      cw: cos(w),
+      a0: 1 + alpha,
+    );
     coeffs.a0 = pre.a0;
     coeffs.a.add((-2 * pre.cw) / pre.a0);
-    coeffs.k = 1;
+    coeffs.k = 1.0;
     coeffs.a.add((1 - pre.alpha) / pre.a0);
     return pre;
   }
@@ -49,19 +52,21 @@ class IirCoeffs extends MapBase<String, Coeffs Function(IirParams)> {
     var Q = params.Q;
     var Fc = params.Fc;
     var Fs = params.Fs;
-    var pre = {} as Coeffs;
     var w = 2 * pi * Fc / Fs;
-    pre.alpha = sin(w) / (2 * Q);
-    pre.cw = cos(w);
-    pre.A = pow(10, params.gain! / 40).toDouble();
+    var pre = Coeffs(
+      alpha: sin(w) / (2 * Q),
+      cw: cos(w),
+      A: pow(10, params.gain / 40).toDouble(),
+    );
     return pre;
   }
 
   static Coeffs initCoeffs() {
-    var coeffs = {} as Coeffs;
-    coeffs.z = [0, 0];
-    coeffs.a = [];
-    coeffs.b = [];
+    var coeffs = Coeffs(
+      z: [0, 0],
+      a: [],
+      b: [],
+    );
     return coeffs;
   }
 
@@ -94,8 +99,8 @@ class IirCoeffs extends MapBase<String, Coeffs Function(IirParams)> {
     final params = iparams as AsBsFcFsPregainParams;
     var coeffs = IirCoeffs.initCoeffs();
     coeffs.a0 = 1;
-    var as = params.as!;
-    var bs = params.bs!;
+    var as = params.as;
+    var bs = params.bs;
     var w = 2 * pi * params.Fc / params.Fs;
     var s = -(as / (2 * bs));
     coeffs.a.add(-pow(e, s * w) *
@@ -103,7 +108,7 @@ class IirCoeffs extends MapBase<String, Coeffs Function(IirParams)> {
         cos(-w * sqrt((pow(as, 2) / (4 * pow(bs, 2)) - 1 / bs).abs())));
     coeffs.a.add(pow(e, 2 * s * w).toDouble());
     // correct gain
-    if (params.preGain == null) {
+    if (!params.preGain) {
       coeffs.b.add(coeffs.a0 + coeffs.a[0] + coeffs.a[1]);
       coeffs.k = 1;
     } else {
@@ -158,7 +163,7 @@ class IirCoeffs extends MapBase<String, Coeffs Function(IirParams)> {
     var coeffs = IirCoeffs.initCoeffs();
     final params = iparams as FcFsQPregainParams;
     var p = IirCoeffs.preCalc(params, coeffs);
-    if (params.preGain != null) {
+    if (params.preGain) {
       coeffs.k = (1 - p.cw) * 0.5;
       coeffs.b.add(1 / (p.a0));
     } else {
@@ -176,7 +181,7 @@ class IirCoeffs extends MapBase<String, Coeffs Function(IirParams)> {
 
     final params = iparams as FcFsQPregainParams;
     var p = IirCoeffs.preCalc(params, coeffs);
-    if (params.preGain != null) {
+    if (params.preGain) {
       coeffs.k = (1 + p.cw) * 0.5;
       coeffs.b.add(1 / (p.a0));
     } else {
@@ -289,9 +294,9 @@ class IirCoeffs extends MapBase<String, Coeffs Function(IirParams)> {
     final params = iparams as FcFsQParams;
     var coeffs = IirCoeffs.initCoeffs();
     coeffs.k = 1;
-    var wo = 2 * pi * params.Fc! / params.Fs!;
+    var wo = 2 * pi * params.Fc / params.Fs;
     var w = 2 * tan(wo / 2);
-    var Q = params.Q!;
+    var Q = params.Q;
     var wsq = pow(w, 2).toDouble();
     coeffs.a0 = 4 * Q + wsq * Q + 2 * w;
     coeffs.a.add(2 * wsq * Q - 8 * Q);
@@ -312,9 +317,15 @@ class IirCoeffs extends MapBase<String, Coeffs Function(IirParams)> {
         "aweighting": aweighting,
         "highshelf": highshelf,
         "highpass": highpass,
+        "highpassBT": highpassBT,
+        "lowpass": lowpass,
+        "lowpassBT": lowpassBT,
+        "lowshelf": lowshelf,
         "bandstop": bandstop,
         "bandpass": bandpass,
-        "bandpassQ": bandpassQ
+        "bandpassQ": bandpassQ,
+        "allpass": allpass,
+        "peak": peak,
       };
   Coeffs Function(IirParams)? operator [](Object? key) {
     return fns[key];
@@ -409,6 +420,7 @@ class FcFsQParams extends FcFsParams {
 
 mixin PreGain {
   bool get preGain;
+  double get gain;
 }
 
 class FcFsQPregainParams extends FcFsQParams with PreGain {

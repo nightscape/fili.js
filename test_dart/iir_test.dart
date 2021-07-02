@@ -119,9 +119,7 @@ void main() {
   group('iir-bessel-lp', () {
     List<Coeffs> filterCoeffs = iirCascadeCalculator['lowpass'](
         FcFsParams(order: 3, characteristic: 'bessel', Fs: 4000, Fc: 500));
-    IirFilter filter;
-
-    filter = new IirFilter(filterCoeffs);
+    IirFilter filter = IirFilter(filterCoeffs);
     test('can calculate coeffs', () {
       expect(filterCoeffs.length, equals(3));
       // filterCoeffs[0].should.be.an.Object

@@ -55,7 +55,10 @@ main() {
     });
 
     test('detects wrong radix', () {
-      expect(() => new Fft(1234), throwsA(matches(".*power of 2.*")));
+      expect(
+          () => Fft(1234),
+          throwsA(const TypeMatcher<Exception>()
+              .having((e) => e.toString(), 'text', matches(".*power of 2.*"))));
     });
   });
 }

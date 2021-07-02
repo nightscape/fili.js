@@ -25,10 +25,10 @@ class Fft {
     };
     */
   static bool isPowerOfTwo(int value) {
-    if (~(value & value - 1) != 0) {
-      return true;
-    }
-    return false;
+    final one = value & (value - 1);
+    final two = ~one;
+
+    return (value & value - 1) == 0;
   }
 
   Fft(this.radix) {
@@ -48,7 +48,7 @@ class Fft {
     );
     var TPI = 2 * pi;
     var bits = (log(radix) / ln2).floor();
-    for (var i = this.fft.sinTable.length; i >= 0; i--) {
+    for (var i = this.fft.sinTable.length - 1; i >= 0; i--) {
       this.fft.sinTable[i] = sin(TPI * (i / radix));
       this.fft.cosTable[i] = cos(TPI * (i / radix));
     }
@@ -469,33 +469,36 @@ class Fft {
       ),
     };
   }
-  windowFunctions(dynamic params) {
+
+  // TODO: In JS this method returns either a number array, or a number
+  // We're falling back to dynamic here in order to do this...
+  dynamic windowFunctions(WinFunction params) {
     var foo = this.windowCalculation[params.name]!;
     if (foo.values.length != params.N) {
       if (params.n == 0) {
         foo.values.length = 0;
       }
 
-      foo.values[params.n] =
-          foo.correction * foo.calc(params.n, params.N, params.a);
+      // TODO: I put this here to hopefully grow the array, but it might as well shrink it...
+      foo.values.insert(
+          params.n,
+          foo.correction *
+              foo.calc(params.n.toDouble(), params.N.toDouble(), params.a));
       return foo.values[params.n];
     }
-    return foo.values[0]; // TODO: I added the [0] part
+    return foo.values;
   }
 
   ComplexVector forward(dynamic b, String window) {
-    var i;
-    var j;
-    var n;
-    var k;
-    var k2;
-    var h;
-    var d;
-    var c;
-    var s;
-    var ik;
-    var dx;
-    var dy;
+    int n;
+    int k2;
+    int h;
+    int d;
+    double c;
+    double s;
+    int ik;
+    double dx;
+    double dy;
     n = this.fft.buffer.length;
     var winFunction = WinFunction(
       name: window,
@@ -504,29 +507,28 @@ class Fft {
       n: 0,
     );
     var w = this.windowFunctions(winFunction);
-    if (false) {
-      // TODO typeof w == 'number') {
-      for (i = 0; i < n; ++i) {
+    if (w is double) {
+      for (var i = 0; i < n; ++i) {
         winFunction.n = i;
         this.fft.buffer[i] = b[i] * this.windowFunctions(winFunction);
       }
     } else {
-      for (i = 0; i < n; ++i) {
+      for (var i = 0; i < n; ++i) {
         this.fft.buffer[i] = b[i] * w[i];
       }
     }
-    for (i = n; i--;) {
+    for (var i = n - 1; i >= 0; i--) {
       this.fft.re[i] = this.fft.buffer[this.fft.twiddle[i]];
       this.fft.im[i] = 0.0;
     }
-    for (k = 1; k < n; k = k2) {
+    for (var k = 1; k < n; k = k2) {
       h = 0;
       k2 = k + k;
-      d = n / k2;
-      for (j = 0; j < k; j++) {
+      d = n ~/ k2; // TODO: Was / instead of ~/
+      for (var j = 0; j < k; j++) {
         c = this.fft.cosTable[h];
         s = this.fft.sinTable[h];
-        for (i = j; i < n; i += k2) {
+        for (var i = j; i < n; i += k2) {
           ik = i + k;
           dx = s * this.fft.im[ik] + c * this.fft.re[ik];
           dy = c * this.fft.im[ik] - s * this.fft.re[ik];
@@ -550,15 +552,15 @@ class Fft {
     var n;
     var k;
     var k2;
-    var h;
-    var d;
+    int h;
+    int d;
     var c;
     var s;
     var ik;
     var dx;
     var dy;
     n = v.re.length;
-    for (i = n; i--;) {
+    for (i = n - 1; i >= 0; i--) {
       j = this.fft.twiddle[i];
       this.fft.reI[i] = v.re[j];
       this.fft.imI[i] = -v.im[j];
@@ -566,7 +568,7 @@ class Fft {
     for (k = 1; k < n; k = k2) {
       h = 0;
       k2 = k + k;
-      d = n / k2;
+      d = n ~/ k2;
       for (j = 0; j < k; j++) {
         c = this.fft.cosTable[h];
         s = this.fft.sinTable[h];
@@ -582,7 +584,7 @@ class Fft {
         h += d;
       }
     }
-    for (i = n; i--;) {
+    for (i = n - 1; i >= 0; i--) {
       this.fft.buffer[i] = this.fft.reI[i] / n;
     }
     return this.fft.buffer;
