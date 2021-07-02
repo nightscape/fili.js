@@ -5,12 +5,12 @@ import 'package:fili.dart/iir_filter.dart';
 import 'package:test/test.dart';
 
 void main() {
-  var iirCascadeCalculator = new CalcCascades();
+  var iirCascadeCalculator = CalcCascades();
 
   group('iir-bessel-bandstop', () {
-    IirCoeffs filterCoeffs = iirCascadeCalculator.bandstop(
-        order: 3, characteristic: 'bessel', Fs: 4000, Fc: 500);
-    List<double> filter = IirFilter(filterCoeffs);
+    List<Coeffs> filterCoeffs = iirCascadeCalculator['bandstop'](
+        FcFsParams(order: 3, characteristic: 'bessel', Fs: 4000, Fc: 500));
+    IirFilter filter = IirFilter(filterCoeffs);
     test('can calculate coeffs', () {
       expect(filterCoeffs.length, equals(3));
       // filterCoeffs[0].should.be.an.Object
@@ -24,29 +24,29 @@ void main() {
     test('can do a single step', () {
       var out = filter.singleStep(10);
       // out.should.be.a.Number
-      out.should.not.equal(0);
+      expect(out, isNot(equals(0)));
     });
 
     test('can do multiple steps', () {
-      var simInput = [];
+      List<double> simInput = [];
       for (var i = 0; i < 10000; i++) {
         simInput.add(i % 10 - 5);
       }
       var out = filter.multiStep(simInput);
       // out.should.be.an.Array
       expect(out.length, equals(10000));
-      out[111].should.not.equal(simInput[111]);
+      expect(out[111], isNot(equals(simInput[111])));
     });
 
     test('can simulate multiple steps', () {
-      var simInput = [];
+      List<double> simInput = [];
       for (var i = 0; i < 10000; i++) {
         simInput.add(i % 10 - 5);
       }
       var out = filter.simulate(simInput);
       // out.should.be.an.Array
       expect(out.length, equals(10000));
-      out[111].should.not.equal(simInput[111]);
+      expect(out[111], isNot(equals(simInput[111])));
     });
 
     test('calculates impulse response', () {
@@ -76,7 +76,7 @@ void main() {
     });
 
     test('calculates filter response', () {
-      var r = filter.response(200);
+      var r = filter.response(resolution: 200);
       // r.should.be.an.Array
       expect(r.length, equals(200));
       // r[20].should.be.an.Object
@@ -87,12 +87,12 @@ void main() {
       // r[20].phaseDelay.should.be.a.Number
       // r[20].groupDelay.should.be.a.Number
 
-      r[20].magnitude.should.not.equal(0);
-      r[20].dBmagnitude.should.not.equal(0);
-      r[20].phase.should.not.equal(0);
-      r[20].unwrappedPhase.should.not.equal(0);
-      r[20].phaseDelay.should.not.equal(0);
-      r[20].groupDelay.should.not.equal(0);
+      expect(r[20].magnitude, isNot(equals(0)));
+      expect(r[20].dBmagnitude, isNot(equals(0)));
+      expect(r[20].phase, isNot(equals(0)));
+      expect(r[20].unwrappedPhase, isNot(equals(0)));
+      expect(r[20].phaseDelay, isNot(equals(0)));
+      expect(r[20].groupDelay, isNot(equals(0)));
 
       r = filter.response();
       // r.should.be.an.Array
@@ -100,15 +100,15 @@ void main() {
     });
 
     test('calculates single filter response', () {
-      var r = filter.responsePoint(Fs: 4000, Fr: 211);
+      var r = filter.responsePoint(FrFsParams(Fs: 4000, Fr: 211));
       // r.should.be.an.Object
       // r.magnitude.should.be.a.Number
       // r.dBmagnitude.should.be.a.Number
       // r.phase.should.be.a.Number
 
-      r.magnitude.should.not.equal(0);
-      r.dBmagnitude.should.not.equal(0);
-      r.phase.should.not.equal(0);
+      expect(r.magnitude, isNot(equals(0)));
+      expect(r.dBmagnitude, isNot(equals(0)));
+      expect(r.phase, isNot(equals(0)));
     });
 
     test('reinit does not crash', () {
@@ -117,10 +117,11 @@ void main() {
   });
 
   group('iir-bessel-lp', () {
-    IirCoeffs filterCoeffs = iirCascadeCalculator.lowpass(
-        order: 3, characteristic: 'bessel', Fs: 4000, Fc: 500);
-    List<double> filter;
+    List<Coeffs> filterCoeffs = iirCascadeCalculator['lowpass'](
+        FcFsParams(order: 3, characteristic: 'bessel', Fs: 4000, Fc: 500));
+    IirFilter filter;
 
+    filter = new IirFilter(filterCoeffs);
     test('can calculate coeffs', () {
       expect(filterCoeffs.length, equals(3));
       // filterCoeffs[0].should.be.an.Object
@@ -130,13 +131,13 @@ void main() {
       expect(filterCoeffs[1].z[0], equals(0));
       expect(filterCoeffs[1].k, equals(1));
 
-      filterCoeffs = iirCascadeCalculator.lowpass({
-        order: 3,
-        characteristic: 'bessel',
-        Fs: 4000,
-        Fc: 500,
-        preGain: true
-      });
+      filterCoeffs = iirCascadeCalculator['lowpass'](FcFsQPregainParams(
+          order: 3,
+          characteristic: 'bessel',
+          Fs: 4000,
+          Fc: 500,
+          Q: 0.0, // TODO: This wasn't there previously
+          preGain: true));
 
       expect(filterCoeffs.length, equals(3));
       // filterCoeffs[0].should.be.an.Object
@@ -144,40 +145,35 @@ void main() {
       expect(filterCoeffs[1].b.length, equals(3));
       expect(filterCoeffs[1].z.length, equals(2));
       expect(filterCoeffs[1].z[0], equals(0));
-      filterCoeffs[1].k.should.not.equal(1);
-    });
-
-    test('can generate a filter', () {
-      filter = new IirFilter(filterCoeffs);
-      // filter.should.be.an.Object
+      expect(filterCoeffs[1].k, isNot(equals(1)));
     });
 
     test('can do a single step', () {
       var out = filter.singleStep(10);
       // out.should.be.a.Number
-      out.should.not.equal(0);
+      expect(out, isNot(equals(0)));
     });
 
     test('can do multiple steps', () {
-      var simInput = [];
+      List<double> simInput = [];
       for (var i = 0; i < 10000; i++) {
         simInput.add(i % 10 - 5);
       }
       var out = filter.multiStep(simInput);
       // out.should.be.an.Array
       expect(out.length, equals(10000));
-      out[111].should.not.equal(simInput[111]);
+      expect(out[111], isNot(equals(simInput[111])));
     });
 
     test('can simulate multiple steps', () {
-      var simInput = [];
+      List<double> simInput = [];
       for (var i = 0; i < 10000; i++) {
         simInput.add(i % 10 - 5);
       }
       var out = filter.simulate(simInput);
       // out.should.be.an.Array
       expect(out.length, equals(10000));
-      out[111].should.not.equal(simInput[111]);
+      expect(out[111], isNot(equals(simInput[111])));
     });
 
     test('calculates impulse response', () {
@@ -207,7 +203,7 @@ void main() {
     });
 
     test('calculates filter response', () {
-      var r = filter.response(200);
+      var r = filter.response(resolution: 200);
       // r.should.be.an.Array
       expect(r.length, equals(200));
       // r[20].should.be.an.Object
@@ -218,12 +214,12 @@ void main() {
       // r[20].phaseDelay.should.be.a.Number
       // r[20].groupDelay.should.be.a.Number
 
-      r[20].magnitude.should.not.equal(0);
-      r[20].dBmagnitude.should.not.equal(0);
-      r[20].phase.should.not.equal(0);
-      r[20].unwrappedPhase.should.not.equal(0);
-      r[20].phaseDelay.should.not.equal(0);
-      r[20].groupDelay.should.not.equal(0);
+      expect(r[20].magnitude, isNot(equals(0)));
+      expect(r[20].dBmagnitude, isNot(equals(0)));
+      expect(r[20].phase, isNot(equals(0)));
+      expect(r[20].unwrappedPhase, isNot(equals(0)));
+      expect(r[20].phaseDelay, isNot(equals(0)));
+      expect(r[20].groupDelay, isNot(equals(0)));
 
       r = filter.response();
       // r.should.be.an.Array
@@ -231,15 +227,15 @@ void main() {
     });
 
     test('calculates single filter response', () {
-      var r = filter.responsePoint({Fs: 4000, Fr: 211});
+      var r = filter.responsePoint(FrFsParams(Fs: 4000, Fr: 211));
       // r.should.be.an.Object
       // r.magnitude.should.be.a.Number
       // r.dBmagnitude.should.be.a.Number
       // r.phase.should.be.a.Number
 
-      r.magnitude.should.not.equal(0);
-      r.dBmagnitude.should.not.equal(0);
-      r.phase.should.not.equal(0);
+      expect(r.magnitude, isNot(equals(0)));
+      expect(r.dBmagnitude, isNot(equals(0)));
+      expect(r.phase, isNot(equals(0)));
     });
 
     test('reinit does not crash', () {
@@ -248,12 +244,14 @@ void main() {
   });
 
   group('iir-bessel-hp', () {
-    IirCoeffs filterCoeffs;
-    List<double> filter;
+    List<Coeffs> filterCoeffs;
+    filterCoeffs = iirCascadeCalculator['highpass'](
+        FcFsParams(order: 2, characteristic: 'bessel', Fs: 4000, Fc: 500));
+    IirFilter filter;
+
+    filter = new IirFilter(filterCoeffs);
 
     test('can calculate coeffs', () {
-      filterCoeffs = iirCascadeCalculator
-          .highpass({order: 2, characteristic: 'bessel', Fs: 4000, Fc: 500});
       expect(filterCoeffs.length, equals(2));
       // filterCoeffs[0].should.be.an.Object
       expect(filterCoeffs[1].a.length, equals(2));
@@ -262,13 +260,13 @@ void main() {
       expect(filterCoeffs[1].z[0], equals(0));
       expect(filterCoeffs[1].k, equals(1));
 
-      filterCoeffs = iirCascadeCalculator.highpass({
-        order: 3,
-        characteristic: 'bessel',
-        Fs: 4000,
-        Fc: 500,
-        preGain: true
-      });
+      filterCoeffs = iirCascadeCalculator['highpass'](FcFsQPregainParams(
+          Q: 0.0, // TODO: This wasn't here before
+          order: 3,
+          characteristic: 'bessel',
+          Fs: 4000,
+          Fc: 500,
+          preGain: true));
 
       expect(filterCoeffs.length, equals(3));
       // filterCoeffs[0].should.be.an.Object
@@ -276,40 +274,35 @@ void main() {
       expect(filterCoeffs[1].b.length, equals(3));
       expect(filterCoeffs[1].z.length, equals(2));
       expect(filterCoeffs[1].z[0], equals(0));
-      filterCoeffs[1].k.should.not.equal(1);
-    });
-
-    test('can generate a filter', () {
-      filter = new IirFilter(filterCoeffs);
-      // filter.should.be.an.Object
+      expect(filterCoeffs[1].k, isNot(equals(1)));
     });
 
     test('can do a single step', () {
       var out = filter.singleStep(10);
       // out.should.be.a.Number
-      out.should.not.equal(0);
+      expect(out, isNot(equals(0)));
     });
 
     test('can do multiple steps', () {
-      var simInput = [];
+      List<double> simInput = [];
       for (var i = 0; i < 10000; i++) {
         simInput.add(i % 10 - 5);
       }
       var out = filter.multiStep(simInput);
       // out.should.be.an.Array
       expect(out.length, equals(10000));
-      out[111].should.not.equal(simInput[111]);
+      expect(out[111], isNot(equals(simInput[111])));
     });
 
     test('can simulate multiple steps', () {
-      var simInput = [];
+      List<double> simInput = [];
       for (var i = 0; i < 10000; i++) {
         simInput.add(i % 10 - 5);
       }
       var out = filter.simulate(simInput);
       // out.should.be.an.Array
       expect(out.length, equals(10000));
-      out[111].should.not.equal(simInput[111]);
+      expect(out[111], isNot(equals(simInput[111])));
     });
 
     test('calculates impulse response', () {
@@ -339,7 +332,7 @@ void main() {
     });
 
     test('calculates filter response', () {
-      var r = filter.response(200);
+      var r = filter.response(resolution: 200);
       // r.should.be.an.Array
       expect(r.length, equals(200));
       // r[20].should.be.an.Object
@@ -350,12 +343,12 @@ void main() {
       // r[20].phaseDelay.should.be.a.Number
       // r[20].groupDelay.should.be.a.Number
 
-      r[20].magnitude.should.not.equal(0);
-      r[20].dBmagnitude.should.not.equal(0);
-      r[20].phase.should.not.equal(0);
-      r[20].unwrappedPhase.should.not.equal(0);
-      r[20].phaseDelay.should.not.equal(0);
-      r[20].groupDelay.should.not.equal(0);
+      expect(r[20].magnitude, isNot(equals(0)));
+      expect(r[20].dBmagnitude, isNot(equals(0)));
+      expect(r[20].phase, isNot(equals(0)));
+      expect(r[20].unwrappedPhase, isNot(equals(0)));
+      expect(r[20].phaseDelay, isNot(equals(0)));
+      expect(r[20].groupDelay, isNot(equals(0)));
 
       r = filter.response();
       // r.should.be.an.Array
@@ -363,15 +356,15 @@ void main() {
     });
 
     test('calculates single filter response', () {
-      var r = filter.responsePoint({Fs: 4000, Fr: 211});
+      var r = filter.responsePoint(FrFsParams(Fs: 4000, Fr: 211));
       // r.should.be.an.Object
       // r.magnitude.should.be.a.Number
       // r.dBmagnitude.should.be.a.Number
       // r.phase.should.be.a.Number
 
-      r.magnitude.should.not.equal(0);
-      r.dBmagnitude.should.not.equal(0);
-      r.phase.should.not.equal(0);
+      expect(r.magnitude, isNot(equals(0)));
+      expect(r.dBmagnitude, isNot(equals(0)));
+      expect(r.phase, isNot(equals(0)));
     });
 
     test('reinit does not crash', () {
@@ -380,12 +373,12 @@ void main() {
   });
 
   group('iir-butterworth-hp', () {
-    IirCoeffs filterCoeffs;
-    List<double> filter;
+    List<Coeffs> filterCoeffs;
+    IirFilter filter;
 
     test('can calculate coeffs', () {
-      filterCoeffs = iirCascadeCalculator.highpass(
-          order: 3, characteristic: 'butterworth', Fs: 8000, Fc: 2234);
+      filterCoeffs = iirCascadeCalculator['highpass'](FcFsParams(
+          order: 3, characteristic: 'butterworth', Fs: 8000, Fc: 2234));
       expect(filterCoeffs.length, equals(3));
       // filterCoeffs[0].should.be.an.Object
       expect(filterCoeffs[1].a.length, equals(2));
@@ -393,54 +386,58 @@ void main() {
       expect(filterCoeffs[1].z.length, equals(2));
       expect(filterCoeffs[1].z[0], equals(0));
       expect(filterCoeffs[1].k, equals(1));
+    });
+  });
+  group('iir-butterworth-hp-pregain', () {
+    List<Coeffs> filterCoeffs;
+    filterCoeffs = iirCascadeCalculator['highpass'](FcFsQPregainParams(
+        Q: 0.0, // TODO: This wasn't here before
 
-      filterCoeffs = iirCascadeCalculator.highpass(
-          order: 3,
-          characteristic: 'butterworth',
-          Fs: 8000,
-          Fc: 1234,
-          preGain: true);
+        order: 3,
+        characteristic: 'butterworth',
+        Fs: 8000,
+        Fc: 1234,
+        preGain: true));
+    IirFilter filter;
 
+    test('can calculate coeffs', () {
       expect(filterCoeffs.length, equals(3));
       // filterCoeffs[0].should.be.an.Object
       expect(filterCoeffs[1].a.length, equals(2));
       expect(filterCoeffs[1].b.length, equals(3));
       expect(filterCoeffs[1].z.length, equals(2));
       expect(filterCoeffs[1].z[0], equals(0));
-      filterCoeffs[1].k.should.not.equal(1);
+      expect(filterCoeffs[1].k, isNot(equals(1)));
     });
 
-    test('can generate a filter', () {
-      filter = new IirFilter(filterCoeffs);
-      // filter.should.be.an.Object
-    });
+    filter = new IirFilter(filterCoeffs);
 
     test('can do a single step', () {
       var out = filter.singleStep(10);
       // out.should.be.a.Number
-      out.should.not.equal(0);
+      expect(out, isNot(equals(0)));
     });
 
     test('can do multiple steps', () {
-      var simInput = [];
+      List<double> simInput = [];
       for (var i = 0; i < 10000; i++) {
         simInput.add(i % 10 - 5);
       }
       var out = filter.multiStep(simInput);
       // out.should.be.an.Array
       expect(out.length, equals(10000));
-      out[111].should.not.equal(simInput[111]);
+      expect(out[111], isNot(equals(simInput[111])));
     });
 
     test('can simulate multiple steps', () {
-      var simInput = [];
+      List<double> simInput = [];
       for (var i = 0; i < 10000; i++) {
         simInput.add(i % 10 - 5);
       }
       var out = filter.simulate(simInput);
       // out.should.be.an.Array
       expect(out.length, equals(10000));
-      out[111].should.not.equal(simInput[111]);
+      expect(out[111], isNot(equals(simInput[111])));
     });
 
     test('calculates impulse response', () {
@@ -470,7 +467,7 @@ void main() {
     });
 
     test('calculates filter response', () {
-      var r = filter.response(200);
+      var r = filter.response(resolution: 200);
       // r.should.be.an.Array
       expect(r.length, equals(200));
       // r[20].should.be.an.Object
@@ -481,12 +478,12 @@ void main() {
       // r[20].phaseDelay.should.be.a.Number
       // r[20].groupDelay.should.be.a.Number
 
-      r[20].magnitude.should.not.equal(0);
-      r[20].dBmagnitude.should.not.equal(0);
-      r[20].phase.should.not.equal(0);
-      r[20].unwrappedPhase.should.not.equal(0);
-      r[20].phaseDelay.should.not.equal(0);
-      r[20].groupDelay.should.not.equal(0);
+      expect(r[20].magnitude, isNot(equals(0)));
+      expect(r[20].dBmagnitude, isNot(equals(0)));
+      expect(r[20].phase, isNot(equals(0)));
+      expect(r[20].unwrappedPhase, isNot(equals(0)));
+      expect(r[20].phaseDelay, isNot(equals(0)));
+      expect(r[20].groupDelay, isNot(equals(0)));
 
       r = filter.response();
       // r.should.be.an.Array
@@ -494,15 +491,15 @@ void main() {
     });
 
     test('calculates single filter response', () {
-      var r = filter.responsePoint(Fs: 4000, Fr: 211);
+      var r = filter.responsePoint(FrFsParams(Fs: 4000, Fr: 211));
       // r.should.be.an.Object
       // r.magnitude.should.be.a.Number
       // r.dBmagnitude.should.be.a.Number
       // r.phase.should.be.a.Number
 
-      r.magnitude.should.not.equal(0);
-      r.dBmagnitude.should.not.equal(0);
-      r.phase.should.not.equal(0);
+      expect(r.magnitude, isNot(equals(0)));
+      expect(r.dBmagnitude, isNot(equals(0)));
+      expect(r.phase, isNot(equals(0)));
     });
 
     test('reinit does not crash', () {
@@ -511,12 +508,12 @@ void main() {
   });
 
   group('iir-butterworth-lp', () {
-    IirCoeffs filterCoeffs;
-    List<double> filter;
+    List<Coeffs> filterCoeffs;
+    IirFilter filter;
 
     test('can calculate coeffs', () {
-      filterCoeffs = iirCascadeCalculator.lowpass(
-          order: 2, characteristic: 'butterworth', Fs: 8000, Fc: 1234);
+      filterCoeffs = iirCascadeCalculator['lowpass'](FcFsParams(
+          order: 2, characteristic: 'butterworth', Fs: 8000, Fc: 1234));
       expect(filterCoeffs.length, equals(2));
       // filterCoeffs[0].should.be.an.Object
       expect(filterCoeffs[1].a.length, equals(2));
@@ -524,54 +521,58 @@ void main() {
       expect(filterCoeffs[1].z.length, equals(2));
       expect(filterCoeffs[1].z[0], equals(0));
       expect(filterCoeffs[1].k, equals(1));
+    });
+  });
+  group('iir-butterworth-lp', () {
+    List<Coeffs> filterCoeffs;
+    filterCoeffs = iirCascadeCalculator['lowpass'](FcFsQPregainParams(
+        Q: 0.0, // TODO: This wasn't here before
 
-      filterCoeffs = iirCascadeCalculator.lowpass(
-          order: 3,
-          characteristic: 'butterworth',
-          Fs: 8000,
-          Fc: 1234,
-          preGain: true);
+        order: 3,
+        characteristic: 'butterworth',
+        Fs: 8000,
+        Fc: 1234,
+        preGain: true));
+    IirFilter filter;
 
+    test('can calculate coeffs', () {
       expect(filterCoeffs.length, equals(3));
       // filterCoeffs[0].should.be.an.Object
       expect(filterCoeffs[1].a.length, equals(2));
       expect(filterCoeffs[1].b.length, equals(3));
       expect(filterCoeffs[1].z.length, equals(2));
       expect(filterCoeffs[1].z[0], equals(0));
-      filterCoeffs[1].k.should.not.equal(1);
+      expect(filterCoeffs[1].k, isNot(equals(1)));
     });
 
-    test('can generate a filter', () {
-      filter = new IirFilter(filterCoeffs);
-      // filter.should.be.an.Object
-    });
+    filter = new IirFilter(filterCoeffs);
 
     test('can do a single step', () {
       var out = filter.singleStep(10);
       // out.should.be.a.Number
-      out.should.not.equal(0);
+      expect(out, isNot(equals(0)));
     });
 
     test('can do multiple steps', () {
-      var simInput = [];
+      List<double> simInput = [];
       for (var i = 0; i < 10000; i++) {
         simInput.add(i % 10 - 5);
       }
       var out = filter.multiStep(simInput);
       // out.should.be.an.Array
       expect(out.length, equals(10000));
-      out[111].should.not.equal(simInput[111]);
+      expect(out[111], isNot(equals(simInput[111])));
     });
 
     test('can simulate multiple steps', () {
-      var simInput = [];
+      List<double> simInput = [];
       for (var i = 0; i < 10000; i++) {
         simInput.add(i % 10 - 5);
       }
       var out = filter.simulate(simInput);
       // out.should.be.an.Array
       expect(out.length, equals(10000));
-      out[111].should.not.equal(simInput[111]);
+      expect(out[111], isNot(equals(simInput[111])));
     });
 
     test('calculates impulse response', () {
@@ -601,7 +602,7 @@ void main() {
     });
 
     test('calculates filter response', () {
-      var r = filter.response(200);
+      var r = filter.response(resolution: 200);
       // r.should.be.an.Array
       expect(r.length, equals(200));
       // r[20].should.be.an.Object
@@ -612,12 +613,12 @@ void main() {
       // r[20].phaseDelay.should.be.a.Number
       // r[20].groupDelay.should.be.a.Number
 
-      r[20].magnitude.should.not.equal(0);
-      r[20].dBmagnitude.should.not.equal(0);
-      r[20].phase.should.not.equal(0);
-      r[20].unwrappedPhase.should.not.equal(0);
-      r[20].phaseDelay.should.not.equal(0);
-      r[20].groupDelay.should.not.equal(0);
+      expect(r[20].magnitude, isNot(equals(0)));
+      expect(r[20].dBmagnitude, isNot(equals(0)));
+      expect(r[20].phase, isNot(equals(0)));
+      expect(r[20].unwrappedPhase, isNot(equals(0)));
+      expect(r[20].phaseDelay, isNot(equals(0)));
+      expect(r[20].groupDelay, isNot(equals(0)));
 
       r = filter.response();
       // r.should.be.an.Array
@@ -625,15 +626,15 @@ void main() {
     });
 
     test('calculates single filter response', () {
-      var r = filter.responsePoint({Fs: 4000, Fr: 211});
+      var r = filter.responsePoint(FrFsParams(Fs: 4000, Fr: 211));
       // r.should.be.an.Object
       // r.magnitude.should.be.a.Number
       // r.dBmagnitude.should.be.a.Number
       // r.phase.should.be.a.Number
 
-      r.magnitude.should.not.equal(0);
-      r.dBmagnitude.should.not.equal(0);
-      r.phase.should.not.equal(0);
+      expect(r.magnitude, isNot(equals(0)));
+      expect(r.dBmagnitude, isNot(equals(0)));
+      expect(r.phase, isNot(equals(0)));
     });
 
     test('reinit does not crash', () {
@@ -642,12 +643,13 @@ void main() {
   });
 
   group('iir-butterworth-bandstop', () {
-    IirCoeffs filterCoeffs;
-    List<double> filter;
+    List<Coeffs> filterCoeffs;
+    filterCoeffs = iirCascadeCalculator['bandstop'](
+        FcFsParams(order: 3, characteristic: 'butterworth', Fs: 4000, Fc: 500));
+    IirFilter filter;
+    filter = new IirFilter(filterCoeffs);
 
     test('can calculate coeffs', () {
-      filterCoeffs = iirCascadeCalculator.bandstop(
-          {order: 3, characteristic: 'butterworth', Fs: 4000, Fc: 500});
       expect(filterCoeffs.length, equals(3));
       // filterCoeffs[0].should.be.an.Object
       expect(filterCoeffs[1].a.length, equals(2));
@@ -657,37 +659,32 @@ void main() {
       expect(filterCoeffs[1].k, equals(1));
     });
 
-    test('can generate a filter', () {
-      filter = new IirFilter(filterCoeffs);
-      // filter.should.be.an.Object
-    });
-
     test('can do a single step', () {
       var out = filter.singleStep(10);
       // out.should.be.a.Number
-      out.should.not.equal(0);
+      expect(out, isNot(equals(0)));
     });
 
     test('can do multiple steps', () {
-      var simInput = [];
+      List<double> simInput = [];
       for (var i = 0; i < 10000; i++) {
         simInput.add(i % 10 - 5);
       }
       var out = filter.multiStep(simInput);
       // out.should.be.an.Array
       expect(out.length, equals(10000));
-      out[111].should.not.equal(simInput[111]);
+      expect(out[111], isNot(equals(simInput[111])));
     });
 
     test('can simulate multiple steps', () {
-      var simInput = [];
+      List<double> simInput = [];
       for (var i = 0; i < 10000; i++) {
         simInput.add(i % 10 - 5);
       }
       var out = filter.simulate(simInput);
       // out.should.be.an.Array
       expect(out.length, equals(10000));
-      out[111].should.not.equal(simInput[111]);
+      expect(out[111], isNot(equals(simInput[111])));
     });
 
     test('calculates impulse response', () {
@@ -717,7 +714,7 @@ void main() {
     });
 
     test('calculates filter response', () {
-      var r = filter.response(200);
+      var r = filter.response(resolution: 200);
       // r.should.be.an.Array
       expect(r.length, equals(200));
       // r[20].should.be.an.Object
@@ -728,12 +725,12 @@ void main() {
       // r[20].phaseDelay.should.be.a.Number
       // r[20].groupDelay.should.be.a.Number
 
-      r[20].magnitude.should.not.equal(0);
-      r[20].dBmagnitude.should.not.equal(0);
-      r[20].phase.should.not.equal(0);
-      r[20].unwrappedPhase.should.not.equal(0);
-      r[20].phaseDelay.should.not.equal(0);
-      r[20].groupDelay.should.not.equal(0);
+      expect(r[20].magnitude, isNot(equals(0)));
+      expect(r[20].dBmagnitude, isNot(equals(0)));
+      expect(r[20].phase, isNot(equals(0)));
+      expect(r[20].unwrappedPhase, isNot(equals(0)));
+      expect(r[20].phaseDelay, isNot(equals(0)));
+      expect(r[20].groupDelay, isNot(equals(0)));
 
       r = filter.response();
       // r.should.be.an.Array
@@ -741,15 +738,15 @@ void main() {
     });
 
     test('calculates single filter response', () {
-      var r = filter.responsePoint(Fs: 4000, Fr: 211);
+      var r = filter.responsePoint(FrFsParams(Fs: 4000, Fr: 211));
       // r.should.be.an.Object
       // r.magnitude.should.be.a.Number
       // r.dBmagnitude.should.be.a.Number
       // r.phase.should.be.a.Number
 
-      r.magnitude.should.not.equal(0);
-      r.dBmagnitude.should.not.equal(0);
-      r.phase.should.not.equal(0);
+      expect(r.magnitude, isNot(equals(0)));
+      expect(r.dBmagnitude, isNot(equals(0)));
+      expect(r.phase, isNot(equals(0)));
     });
 
     test('reinit does not crash', () {
@@ -761,13 +758,15 @@ void main() {
     var filterCoeffs;
 
     test('can calculate lowpass Bessel matched-Z', () {
-      filterCoeffs = iirCascadeCalculator.lowpass(
+      filterCoeffs = iirCascadeCalculator['lowpass'](FcFsQPregainParams(
+          Q: 0.0, // TODO: This wasn't here before
+
           order: 3,
           characteristic: 'bessel',
           transform: 'matchedZ',
           Fs: 4000,
           Fc: 500,
-          preGain: false);
+          preGain: false));
       expect(filterCoeffs.length, equals(3));
       // filterCoeffs[0].should.be.an.Object
       expect(filterCoeffs[1].a.length, equals(2));
@@ -778,13 +777,15 @@ void main() {
     });
 
     test('can calculate lowpass Butterworth matched-Z', () {
-      filterCoeffs = iirCascadeCalculator.lowpass(
+      filterCoeffs = iirCascadeCalculator['lowpass'](FcFsQPregainParams(
+          Q: 0.0, // TODO: This wasn't here before
+
           order: 3,
           characteristic: 'butterworth',
           transform: 'matchedZ',
           Fs: 4000,
           Fc: 500,
-          preGain: false);
+          preGain: false));
       expect(filterCoeffs.length, equals(3));
       // filterCoeffs[0].should.be.an.Object
       expect(filterCoeffs[1].a.length, equals(2));
@@ -795,13 +796,14 @@ void main() {
     });
 
     test('can calculate allpass matched-Z', () {
-      filterCoeffs = iirCascadeCalculator.lowpass(
+      filterCoeffs = iirCascadeCalculator['lowpass'](FcFsQPregainParams(
+          Q: 0.0, // TODO: This wasn't here before
           order: 3,
           characteristic: 'allpass',
           transform: 'matchedZ',
           Fs: 4000,
           Fc: 500,
-          preGain: false);
+          preGain: false));
       expect(filterCoeffs.length, equals(3));
       // filterCoeffs[0].should.be.an.Object
       expect(filterCoeffs[1].a.length, equals(2));
@@ -812,13 +814,14 @@ void main() {
     });
 
     test('can calculate lowpass Tschebyscheff05 matched-Z', () {
-      filterCoeffs = iirCascadeCalculator.lowpass(
+      filterCoeffs = iirCascadeCalculator['lowpass'](FcFsQPregainParams(
+          Q: 0.0, // TODO: This wasn't here before
           order: 3,
           characteristic: 'tschebyscheff05',
           transform: 'matchedZ',
           Fs: 4000,
           Fc: 500,
-          preGain: false);
+          preGain: false));
       expect(filterCoeffs.length, equals(3));
       // filterCoeffs[0].should.be.an.Object
       expect(filterCoeffs[1].a.length, equals(2));
@@ -829,13 +832,14 @@ void main() {
     });
 
     test('can calculate lowpass Tschebyscheff1 matched-Z', () {
-      filterCoeffs = iirCascadeCalculator.lowpass(
+      filterCoeffs = iirCascadeCalculator['lowpass'](FcFsQPregainParams(
+          Q: 0.0, // TODO: This wasn't here before
           order: 3,
           characteristic: 'tschebyscheff1',
           transform: 'matchedZ',
           Fs: 4000,
           Fc: 500,
-          preGain: false);
+          preGain: false));
       expect(filterCoeffs.length, equals(3));
       // filterCoeffs[0].should.be.an.Object
       expect(filterCoeffs[1].a.length, equals(2));
@@ -846,13 +850,14 @@ void main() {
     });
 
     test('can calculate lowpass Tschebyscheff2 matched-Z', () {
-      filterCoeffs = iirCascadeCalculator.lowpass(
+      filterCoeffs = iirCascadeCalculator['lowpass'](FcFsQPregainParams(
+          Q: 0.0, // TODO: This wasn't here before
           order: 3,
           characteristic: 'tschebyscheff2',
           transform: 'matchedZ',
           Fs: 4000,
           Fc: 500,
-          preGain: false);
+          preGain: false));
       expect(filterCoeffs.length, equals(3));
       // filterCoeffs[0].should.be.an.Object
       expect(filterCoeffs[1].a.length, equals(2));
@@ -863,13 +868,14 @@ void main() {
     });
 
     test('can calculate lowpass Tschebyscheff3 matched-Z', () {
-      filterCoeffs = iirCascadeCalculator.lowpass(
+      filterCoeffs = iirCascadeCalculator['lowpass'](FcFsQPregainParams(
+          Q: 0.0, // TODO: This wasn't here before
           order: 3,
           characteristic: 'tschebyscheff3',
           transform: 'matchedZ',
           Fs: 4000,
           Fc: 500,
-          preGain: false);
+          preGain: false));
       expect(filterCoeffs.length, equals(3));
       // filterCoeffs[0].should.be.an.Object
       expect(filterCoeffs[1].a.length, equals(2));
@@ -880,8 +886,8 @@ void main() {
     });
 
     test('can calculate allpass bilinear transform', () {
-      filterCoeffs = iirCascadeCalculator.allpass(
-          order: 3, characteristic: 'butterworth', Fs: 4000, Fc: 500);
+      filterCoeffs = iirCascadeCalculator['allpass'](FcFsParams(
+          order: 3, characteristic: 'butterworth', Fs: 4000, Fc: 500));
       expect(filterCoeffs.length, equals(3));
       // filterCoeffs[0].should.be.an.Object
       expect(filterCoeffs[1].a.length, equals(2));
@@ -892,8 +898,8 @@ void main() {
     });
 
     test('can calculate A weighting bilinear transform', () {
-      filterCoeffs = iirCascadeCalculator.aweighting(
-          order: 3, characteristic: 'butterworth', Fs: 4000, Fc: 500);
+      filterCoeffs = iirCascadeCalculator['aweighting'](FcFsParams(
+          order: 3, characteristic: 'butterworth', Fs: 4000, Fc: 500));
       expect(filterCoeffs.length, equals(3));
       // filterCoeffs[0].should.be.an.Object
       expect(filterCoeffs[1].a.length, equals(2));
@@ -904,8 +910,8 @@ void main() {
     });
 
     test('can calculate highshelf bilinear transform', () {
-      filterCoeffs = iirCascadeCalculator.highshelf(
-          order: 3, characteristic: 'butterworth', Fs: 4000, Fc: 500);
+      filterCoeffs = iirCascadeCalculator['highshelf'](FcFsParams(
+          order: 3, characteristic: 'butterworth', Fs: 4000, Fc: 500));
       expect(filterCoeffs.length, equals(3));
       // filterCoeffs[0].should.be.an.Object
       expect(filterCoeffs[1].a.length, equals(2));
@@ -916,8 +922,8 @@ void main() {
     });
 
     test('can calculate lowshelf bilinear transform', () {
-      filterCoeffs = iirCascadeCalculator.lowshelf(
-          order: 3, characteristic: 'butterworth', Fs: 4000, Fc: 500);
+      filterCoeffs = iirCascadeCalculator['lowshelf'](FcFsParams(
+          order: 3, characteristic: 'butterworth', Fs: 4000, Fc: 500));
       expect(filterCoeffs.length, equals(3));
       // filterCoeffs[0].should.be.an.Object
       expect(filterCoeffs[1].a.length, equals(2));
@@ -928,8 +934,8 @@ void main() {
     });
 
     test('can calculate peaking filter bilinear transform', () {
-      filterCoeffs = iirCascadeCalculator.peak(
-          order: 3, characteristic: 'butterworth', Fs: 4000, Fc: 500);
+      filterCoeffs = iirCascadeCalculator['peak'](FcFsParams(
+          order: 3, characteristic: 'butterworth', Fs: 4000, Fc: 500));
       expect(filterCoeffs.length, equals(3));
       // filterCoeffs[0].should.be.an.Object
       expect(filterCoeffs[1].a.length, equals(2));
@@ -940,8 +946,8 @@ void main() {
     });
 
     test('can calculate bandpass bilinear transform', () {
-      filterCoeffs = iirCascadeCalculator.bandpass(
-          order: 3, characteristic: 'butterworth', Fs: 4000, Fc: 500);
+      filterCoeffs = iirCascadeCalculator['bandpass'](FcFsParams(
+          order: 3, characteristic: 'butterworth', Fs: 4000, Fc: 500));
       expect(filterCoeffs.length, equals(3));
       // filterCoeffs[0].should.be.an.Object
       expect(filterCoeffs[1].a.length, equals(2));
@@ -952,8 +958,8 @@ void main() {
     });
 
     test('can calculate bandpass Q bilinear transform', () {
-      filterCoeffs = iirCascadeCalculator.bandpassQ(
-          order: 3, characteristic: 'butterworth', Fs: 4000, Fc: 500);
+      filterCoeffs = iirCascadeCalculator['bandpassQ'](FcFsParams(
+          order: 3, characteristic: 'butterworth', Fs: 4000, Fc: 500));
       expect(filterCoeffs.length, equals(3));
       // filterCoeffs[0].should.be.an.Object
       expect(filterCoeffs[1].a.length, equals(2));
@@ -964,8 +970,8 @@ void main() {
     });
 
     test('can calculate lowpass BesselThomson bilinear transform', () {
-      filterCoeffs = iirCascadeCalculator.lowpassBT(
-          order: 3, characteristic: 'bessel', Fs: 4000, Fc: 500);
+      filterCoeffs = iirCascadeCalculator['lowpassBT'](
+          FcFsParams(order: 3, characteristic: 'bessel', Fs: 4000, Fc: 500));
       expect(filterCoeffs.length, equals(3));
       // filterCoeffs[0].should.be.an.Object
       expect(filterCoeffs[1].a.length, equals(2));
@@ -976,8 +982,8 @@ void main() {
     });
 
     test('can calculate highpass BesselThomson bilinear transform', () {
-      filterCoeffs = iirCascadeCalculator.highpassBT(
-          order: 3, characteristic: 'bessel', Fs: 4000, Fc: 500);
+      filterCoeffs = iirCascadeCalculator['highpassBT'](
+          FcFsParams(order: 3, characteristic: 'bessel', Fs: 4000, Fc: 500));
       expect(filterCoeffs.length, equals(3));
       // filterCoeffs[0].should.be.an.Object
       expect(filterCoeffs[1].a.length, equals(2));
@@ -990,8 +996,8 @@ void main() {
 
   group('iir-helpers', () {
     test('can get available filters', () {
-      var av = iirCascadeCalculator.available();
-      av.length.should.not.equal(0);
+      var av = iirCascadeCalculator.available;
+      expect(av.length, isNot(equals(0)));
       // av[1].should.be.a.String
     });
   });

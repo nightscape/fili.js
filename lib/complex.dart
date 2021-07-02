@@ -4,7 +4,7 @@ class Complex {
   double re;
   double im;
   Complex(this.re, this.im);
-  Complex divd(Complex q) {
+  Complex div(Complex q) {
     var a = re;
     var b = im;
     var c = q.re;

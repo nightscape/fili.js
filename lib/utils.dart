@@ -55,8 +55,8 @@ evaluatePhase(List<dynamic> res) {
  * Run multi filter
  */
 
-List<double> runMultiFilter(List<double> input, dynamic d,
-    double Function(double input, dynamic d) doStep,
+List<double> runMultiFilter<T>(
+    List<double> input, T d, double Function(double input, T d) doStep,
     {bool overwrite = false}) {
   List<double> out;
   if (overwrite) {
@@ -70,8 +70,8 @@ List<double> runMultiFilter(List<double> input, dynamic d,
   return out;
 }
 
-List<double> runMultiFilterReverse(List<double> input, dynamic d,
-    double Function(double input, dynamic d) doStep,
+List<double> runMultiFilterReverse<T>(
+    List<double> input, T d, double Function(double input, T d) doStep,
     {bool overwrite = false}) {
   List<double> out;
   if (overwrite) {

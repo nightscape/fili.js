@@ -483,7 +483,7 @@ class Fft {
     return foo.values[0]; // TODO: I added the [0] part
   }
 
-  forward(dynamic b, String window) {
+  ComplexVector forward(dynamic b, String window) {
     var i;
     var j;
     var n;
@@ -544,7 +544,7 @@ class Fft {
     );
   }
 
-  inverse(ComplexVector v) {
+  List<double> inverse(ComplexVector v) {
     var i;
     var j;
     var n;

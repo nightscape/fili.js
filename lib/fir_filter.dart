@@ -107,14 +107,14 @@ class FirFilter implements Filter {
   }
 
   List<double> multiStep(List<double> simInput, {bool overwrite = false}) {
-    return runMultiFilter(
+    return runMultiFilter<BufPoint>(
         simInput, this.z, (input, coeffs) => this.doStep(input, coeffs),
         overwrite: overwrite);
   }
 
   filtfilt(dynamic input, {bool overwrite = false}) {
-    return runMultiFilterReverse(
-        runMultiFilter(
+    return runMultiFilterReverse<BufPoint>(
+        runMultiFilter<BufPoint>(
             input, this.z, (input, coeffs) => this.doStep(input, coeffs),
             overwrite: overwrite),
         this.z,

@@ -408,53 +408,59 @@ var tiTable = {
     ],
   ),
 };
-List<Coeffs> calcCoeffs(IirParams params, String behavior) {
+List<Coeffs> calcCoeffs(IirParams iparams, String behavior) {
   List<Coeffs> filter = [];
   if (behavior != 'fromPZ') {
-    if (params.order! > 12) {
+    PZParams params = iparams as PZParams;
+    if (params.order > 12) {
       params.order = 12;
     }
-    for (var cnt = 0; cnt < params.order!; cnt++) {
+    for (var cnt = 0; cnt < params.order; cnt++) {
       var q;
       var f;
       var fd;
       if (params.transform == 'matchedZ') {
-        filter.add(getCoeffs['lowpassMZ'](IirParams(
+        filter.add(getCoeffs.lowpassMZ(AsBsFcFsPregainParams(
+          order: 0, // TODO: Maybe not read
+          Q: 0, // TODO: Maybe not read
+          characteristic: "", // TODO: Was not set
           Fs: params.Fs,
           Fc: params.Fc,
           preGain: params.preGain,
-          as: tiTable[params.characteristic]!.as[params.order! - 1][cnt],
-          bs: tiTable[params.characteristic]!.bs[params.order! - 1][cnt],
+          as: tiTable[params.characteristic]!.as[params.order - 1][cnt],
+          bs: tiTable[params.characteristic]!.bs[params.order - 1][cnt],
         )));
       } else {
         if (params.characteristic == 'butterworth') {
-          q = 0.5 / (sin((pi / (params.order! * 2)) * (cnt + 0.5)));
+          q = 0.5 / (sin((pi / (params.order * 2)) * (cnt + 0.5)));
           f = 1;
         } else {
-          q = table['bessel']!['q']![params.order! - 1][cnt];
+          q = table['bessel']!['q']![params.order - 1][cnt];
           if (params.oneDb != null) {
-            f = table['bessel']!['f1dB']![params.order! - 1][cnt];
+            f = table['bessel']!['f1dB']![params.order - 1][cnt];
           } else {
-            f = table['bessel']!['f3dB']![params.order! - 1][cnt];
+            f = table['bessel']!['f3dB']![params.order - 1][cnt];
           }
         }
         if (behavior == 'highpass') {
-          fd = params.Fc! / f;
+          fd = params.Fc / f;
         } else {
-          fd = params.Fc! * f;
+          fd = params.Fc * f;
         }
         if (behavior == 'bandpass' || behavior == 'bandstop') {
           if (params.characteristic == 'bessel') {
-            fd = sqrt(params.order!) * fd / params.order!;
+            fd = sqrt(params.order) * fd / params.order;
           }
         }
-        filter.add(getCoeffs[behavior](IirParams(
+        filter.add(getCoeffs[behavior]!(FcFsQPregainParams(
+          order: 1, // TODO: Was not set
+          characteristic: "", // TODO: Was not set
           Fs: params.Fs,
           Fc: fd,
           Q: q,
-          BW: params.BW ?? 0,
-          gain: params.gain ?? 0,
-          preGain: params.preGain ?? 0.0, // TODO: Used to be false
+
+          gain: params.gain,
+          preGain: params.preGain, // TODO: Used to be false by default
         )));
       }
     }
@@ -468,21 +474,22 @@ List<Coeffs> calcCoeffs(IirParams params, String behavior) {
   return filter;
 }
 
-initCalcCoeffs(String behavior) {
-  return (dynamic params) {
+List<Coeffs> Function(IirParams) initCalcCoeffs(String behavior) {
+  return (IirParams params) {
     return calcCoeffs(params, behavior);
   };
 }
 
 class CalcCascades {
-  late Map<String, dynamic> cascades;
-  operator [](String key) {
-    return cascades[key];
+  late Map<String, List<Coeffs> Function(IirParams)> cascades;
+  List<Coeffs> Function(IirParams) operator [](String key) {
+    return cascades[key] ?? (throw Exception("Could not read $key"));
   }
 
   late List<String> available = [];
   CalcCascades() {
-    for (var k in getCoeffs {
+    cascades = Map();
+    for (var k in getCoeffs.keys) {
       this.cascades[k] = initCalcCoeffs(k);
       this.available.add(k);
     }

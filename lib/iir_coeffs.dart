@@ -3,7 +3,7 @@ import 'dart:math';
 import 'complex.dart';
 import 'math_ext.dart';
 
-abstract class Coeffs {
+class Coeffs {
   double a0;
   List<double> a;
   List<double> b;
@@ -29,17 +29,12 @@ abstract class Coeffs {
 }
 
 class IirCoeffs extends MapBase<String, Coeffs Function(IirParams)> {
-  static preCalc(BWFcFsQParams params, dynamic coeffs) {
-    var Q = params.Q;
+  static preCalc(FcFsQParams params, dynamic coeffs) {
     var Fc = params.Fc;
     var Fs = params.Fs;
     var pre = {} as Coeffs;
     var w = 2 * pi * Fc / Fs;
-    if (params.BW != null) {
-      pre.alpha = sin(w) * (log(2) / 2 * params.BW! * w / sin(w)).sinh();
-    } else {
-      pre.alpha = sin(w) / (2 * Q);
-    }
+    pre.alpha = sin(w) / (2 * params.Q);
     pre.cw = cos(w);
     pre.a0 = 1 + pre.alpha;
     coeffs.a0 = pre.a0;
@@ -50,10 +45,10 @@ class IirCoeffs extends MapBase<String, Coeffs Function(IirParams)> {
   }
 
   static preCalcGain(IirParams iparams) {
-    final params = iparams as FcFsQParams;
-    var Q = params.Q!;
-    var Fc = params.Fc!;
-    var Fs = params.Fs!;
+    final params = iparams as FcFsQPregainParams;
+    var Q = params.Q;
+    var Fc = params.Fc;
+    var Fs = params.Fs;
     var pre = {} as Coeffs;
     var w = 2 * pi * Fc / Fs;
     pre.alpha = sin(w) / (2 * Q);
@@ -96,7 +91,7 @@ class IirCoeffs extends MapBase<String, Coeffs Function(IirParams)> {
 
   // lowpass matched-z transform: H(s) = 1/(1+a's/w_c+b's^2/w_c)
   Coeffs lowpassMZ(IirParams iparams) {
-    final params = iparams as FcFsQParams;
+    final params = iparams as AsBsFcFsPregainParams;
     var coeffs = IirCoeffs.initCoeffs();
     coeffs.a0 = 1;
     var as = params.as!;
@@ -127,9 +122,7 @@ class IirCoeffs extends MapBase<String, Coeffs Function(IirParams)> {
     params.Q = 1;
     coeffs.wp = tan((2 * pi * params.Fc) / (2 * params.Fs));
     coeffs.wp2 = coeffs.wp * coeffs.wp;
-//      if (params.BW) {
-//        delete params.BW;
-//      }
+
     coeffs.k = 1;
     coeffs.a0 = 3 * coeffs.wp + 3 * coeffs.wp2 + 1;
     coeffs.b.add(3 * coeffs.wp2 * params.Q / coeffs.a0);
@@ -146,9 +139,7 @@ class IirCoeffs extends MapBase<String, Coeffs Function(IirParams)> {
     params.Q = 1;
     coeffs.wp = tan((2 * pi * params.Fc) / (2 * params.Fs));
     coeffs.wp2 = coeffs.wp * coeffs.wp;
-//      if (params.BW) {
-//        delete params.BW;
-//      }
+
     coeffs.k = 1;
     coeffs.a0 = coeffs.wp + coeffs.wp2 + 3;
     coeffs.b.add(3 * params.Q / coeffs.a0);
@@ -165,10 +156,7 @@ class IirCoeffs extends MapBase<String, Coeffs Function(IirParams)> {
   // H(s) = 1 / (s^2 + s/Q + 1)
   Coeffs lowpass(IirParams iparams) {
     var coeffs = IirCoeffs.initCoeffs();
-//      if (params.BW) {
-//        delete params.BW;
-//      }
-    final params = iparams as BWFcFsQParams;
+    final params = iparams as FcFsQPregainParams;
     var p = IirCoeffs.preCalc(params, coeffs);
     if (params.preGain != null) {
       coeffs.k = (1 - p.cw) * 0.5;
@@ -185,10 +173,8 @@ class IirCoeffs extends MapBase<String, Coeffs Function(IirParams)> {
   // H(s) = s^2 / (s^2 + s/Q + 1)
   Coeffs highpass(IirParams iparams) {
     var coeffs = IirCoeffs.initCoeffs();
-//      if (params.BW) {
-//        delete params.BW;
-//      }
-    final params = iparams as BWFcFsQParams;
+
+    final params = iparams as FcFsQPregainParams;
     var p = IirCoeffs.preCalc(params, coeffs);
     if (params.preGain != null) {
       coeffs.k = (1 + p.cw) * 0.5;
@@ -205,10 +191,8 @@ class IirCoeffs extends MapBase<String, Coeffs Function(IirParams)> {
   // H(s) = (s^2 - s/Q + 1) / (s^2 + s/Q + 1)
   Coeffs allpass(IirParams iparams) {
     var coeffs = IirCoeffs.initCoeffs();
-//      if (params.BW) {
-//        delete params.BW;
-//      }
-    final params = iparams as BWFcFsQParams;
+
+    final params = iparams as FcFsQParams;
     var p = IirCoeffs.preCalc(params, coeffs);
     coeffs.k = 1;
     coeffs.b.add((1 - p.alpha) / p.a0);
@@ -220,7 +204,7 @@ class IirCoeffs extends MapBase<String, Coeffs Function(IirParams)> {
   // H(s) = s / (s^2 + s/Q + 1)
   Coeffs bandpassQ(IirParams iparams) {
     var coeffs = IirCoeffs.initCoeffs();
-    final params = iparams as BWFcFsQParams;
+    final params = iparams as FcFsQParams;
     var p = IirCoeffs.preCalc(params, coeffs);
     coeffs.k = 1;
     coeffs.b.add(p.alpha * params.Q / p.a0);
@@ -232,7 +216,7 @@ class IirCoeffs extends MapBase<String, Coeffs Function(IirParams)> {
   // H(s) = (s/Q) / (s^2 + s/Q + 1)
   Coeffs bandpass(IirParams iparams) {
     var coeffs = IirCoeffs.initCoeffs();
-    final params = iparams as BWFcFsQParams;
+    final params = iparams as FcFsQParams;
     var p = IirCoeffs.preCalc(params, coeffs);
     coeffs.k = 1;
     coeffs.b.add(p.alpha / p.a0);
@@ -244,7 +228,7 @@ class IirCoeffs extends MapBase<String, Coeffs Function(IirParams)> {
   // H(s) = (s^2 + 1) / (s^2 + s/Q + 1)
   Coeffs bandstop(IirParams iparams) {
     var coeffs = IirCoeffs.initCoeffs();
-    final params = iparams as BWFcFsQParams;
+    final params = iparams as FcFsQParams;
     var p = IirCoeffs.preCalc(params, coeffs);
     coeffs.k = 1;
     coeffs.b.add(1 / p.a0);
@@ -270,9 +254,7 @@ class IirCoeffs extends MapBase<String, Coeffs Function(IirParams)> {
   // H(s) = A * (s^2 + (sqrt(A)/Q)*s + A)/(A*s^2 + (sqrt(A)/Q)*s + 1)
   Coeffs lowshelf(IirParams params) {
     var coeffs = IirCoeffs.initCoeffs();
-//      if (params.BW) {
-//        delete params.BW;
-//      }
+
     var p = IirCoeffs.preCalcGain(params);
     coeffs.k = 1;
     var sa = 2 * sqrt(p.A) * p.alpha;
@@ -288,9 +270,7 @@ class IirCoeffs extends MapBase<String, Coeffs Function(IirParams)> {
   // H(s) = A * (A*s^2 + (sqrt(A)/Q)*s + 1)/(s^2 + (sqrt(A)/Q)*s + A)
   Coeffs highshelf(IirParams params) {
     var coeffs = IirCoeffs.initCoeffs();
-//      if (params.BW) {
-//        delete params.BW;
-//      }
+
     var p = IirCoeffs.preCalcGain(params);
     coeffs.k = 1;
     var sa = 2 * sqrt(p.A) * p.alpha;
@@ -328,8 +308,14 @@ class IirCoeffs extends MapBase<String, Coeffs Function(IirParams)> {
   @override
   void clear() {}
 
-  Map<String, Coeffs Function(IirParams)> get fns =>
-      {"aweighting": aweighting, "highshelf": highshelf, "highpass": highpass};
+  Map<String, Coeffs Function(IirParams)> get fns => {
+        "aweighting": aweighting,
+        "highshelf": highshelf,
+        "highpass": highpass,
+        "bandstop": bandstop,
+        "bandpass": bandpass,
+        "bandpassQ": bandpassQ
+      };
   Coeffs Function(IirParams)? operator [](Object? key) {
     return fns[key];
   }
@@ -344,34 +330,24 @@ class IirCoeffs extends MapBase<String, Coeffs Function(IirParams)> {
 }
 
 class IirParams {
-  int? order;
   double? Fa;
   double? Fb;
-  double? gain;
-  double? preGain;
   bool? oneDb;
   String? transform;
-  String? characteristic;
+  String characteristic;
   double? Att;
-  double? as;
-  double? bs;
 
   IirParams({
-    this.order,
     this.Fa,
     this.Fb,
-    this.gain,
-    this.preGain,
     this.oneDb,
     this.transform,
-    this.characteristic,
+    this.characteristic = "",
     this.Att,
-    this.as,
-    this.bs,
   });
 }
 
-class PZParams extends IirParams {
+class PZParams extends FcFsQPregainParams {
   Complex z0;
   Complex z1;
 
@@ -379,29 +355,105 @@ class PZParams extends IirParams {
 
   Complex p1;
   String type;
-  PZParams(
-      {required this.z0,
-      required this.z1,
-      required this.p0,
-      required this.p1,
-      required this.type});
+  PZParams({
+    required int order,
+    required String characteristic,
+    required this.z0,
+    required this.z1,
+    required this.p0,
+    required this.p1,
+    required this.type,
+    required bool preGain,
+    required double Fc,
+    required double Fs,
+  }) : super(
+            order: order,
+            characteristic: characteristic,
+            preGain: preGain,
+            Fc: Fc,
+            Fs: Fs,
+            Q: 0.0);
 }
 
-class FcFsQParams extends IirParams {
+class FcFsParams extends IirParams {
+  int order;
   double Fc;
   double Fs;
-  double Q;
 
-  FcFsQParams({required this.Fc, required this.Fs, required this.Q});
+  FcFsParams({
+    required this.order,
+    required characteristic,
+    required this.Fc,
+    required this.Fs,
+    String? transform,
+  }) : super(characteristic: characteristic, transform: transform);
 }
 
-class BWFcFsQParams extends FcFsQParams {
-  double? BW;
+class FcFsQParams extends FcFsParams {
+  double Q;
 
-  BWFcFsQParams(
-      {required this.BW,
+  FcFsQParams(
+      {required int order,
+      required String characteristic,
+      String? transform,
+      required double Fc,
+      required double Fs,
+      required this.Q})
+      : super(
+            order: order,
+            characteristic: characteristic,
+            transform: transform,
+            Fc: Fc,
+            Fs: Fs);
+}
+
+mixin PreGain {
+  bool get preGain;
+}
+
+class FcFsQPregainParams extends FcFsQParams with PreGain {
+  bool preGain;
+  double gain;
+
+  FcFsQPregainParams(
+      {required int order,
+      required String characteristic,
+      String? transform,
+      required this.preGain,
+      this.gain = 0.0,
       required double Fc,
       required double Fs,
       required double Q})
-      : super(Fc: Fc, Fs: Fs, Q: Q);
+      : super(
+            order: order,
+            characteristic: characteristic,
+            transform: transform,
+            Fc: Fc,
+            Fs: Fs,
+            Q: Q);
 }
+
+class AsBsFcFsPregainParams extends FcFsQPregainParams {
+  double as;
+  double bs;
+
+  AsBsFcFsPregainParams(
+      {required int order,
+      required String characteristic,
+      required this.as,
+      required this.bs,
+      required double Fc,
+      required double Fs,
+      required double Q,
+      required bool preGain})
+      : super(
+            order: order,
+            characteristic: characteristic,
+            Fc: Fc,
+            Fs: Fs,
+            Q: Q,
+            preGain: preGain);
+}
+
+//typedef Foo = FcFsParams with PreGain;
+//double dosth(Foo a) { return 0.0;}
