@@ -83,7 +83,6 @@ export default class FirCoeffs {
   }
   // invert for highpass from lowpass
   static invert(h: number[]) {
-    let cnt;
     for (let cnt = 0; cnt < h.length; cnt++) {
       h[cnt] = -h[cnt];
     }

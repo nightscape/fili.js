@@ -20,7 +20,6 @@ export default class FirFilter implements Filter {
   z: any
   constructor(filter: any) {
     this.f = filter;
-    const cnt = 0;
     // note: coefficients are equal to input response
     for (let cnt = 0; cnt < this.f.length; cnt++) {
       this.b[cnt] = {
@@ -46,7 +45,6 @@ export default class FirFilter implements Filter {
   doStep(input: number, d: any): number {
     d.buf[d.pointer] = input;
     let out = 0;
-    const cnt = 0;
     for (let cnt = 0; cnt < d.buf.length; cnt++) {
       out += (this.f[cnt] * d.buf[(d.pointer + cnt) % d.buf.length]);
     }
@@ -91,7 +89,6 @@ export default class FirFilter implements Filter {
   response(resolution: number) {
     resolution = resolution || 100;
     const res = [];
-    const cnt = 0;
     const r = resolution * 2;
     for (let cnt = 0; cnt < resolution; cnt++) {
       res[cnt] = this.calcResponse({

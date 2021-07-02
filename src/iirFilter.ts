@@ -59,7 +59,6 @@ export default class IirFilter implements Filter {
     }
     doStep(input: any, coeffs: any) {
       let out = input;
-      const cnt = 0;
       for (let cnt = 0; cnt < coeffs.length; cnt++) {
         out = this.runStage(coeffs[cnt], out);
       }
@@ -87,7 +86,6 @@ export default class IirFilter implements Filter {
       return res;
     }
     calcResponse(params: any) {
-      const cnt = 0;
       const res = {
         magnitude: 1,
         phase: 0,
@@ -145,7 +143,6 @@ export default class IirFilter implements Filter {
     predefinedResponse(def: any, length: any) {
       const ret = {};
       const input = [];
-      const cnt = 0;
       for (let cnt = 0; cnt < length; cnt++) {
         input.push(def(cnt));
       }
@@ -232,7 +229,6 @@ export default class IirFilter implements Filter {
     response(resolution: any) {
       resolution = resolution || 100;
       const res = [];
-      const cnt = 0;
       const r = resolution * 2;
       for (let cnt = 0; cnt < resolution; cnt++) {
         res[cnt] = this.calcResponse({
@@ -247,7 +243,6 @@ export default class IirFilter implements Filter {
       return this.getPZ();
     }
     reInit() {
-      const cnt = 0;
       for (let cnt = 0; cnt < this.cf.length; cnt++) {
         this.cf[cnt].z = [0, 0];
       }
