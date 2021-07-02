@@ -375,12 +375,12 @@ export default class Fft {
         this.windowCalculation[params.name].values[params.n] = this.windowCalculation[params.name].correction * this.windowCalculation[params.name].calc(params.n, params.N, params.a);
         return this.windowCalculation[params.name].values[params.n];
       }
-      return this.windowCalculation[params.name].values[0]; // TODO: I added the [0] part
+      return this.windowCalculation[params.name]; // TODO: I added the [0] part
     }
 
     forward(b: any, window: any) {
-      let i; let j; let n; let k; let k2; let h; let d; let c; let s; let ik; let dx; let dy;
-      n = this.fft.buffer.length;
+      let i; let j; let k; let k2; let h; let d; let c; let s; let ik; let dx; let dy;
+      const n = this.fft.buffer.length;
       const winFunction = {
         name: window,
         N: n,
@@ -427,9 +427,9 @@ export default class Fft {
       };
     }
     inverse(re: any, im: any) {
-      let i; let j; let n; let k; let k2; let h; let d; let c; let s; let ik; let dx; let dy;
-      n = re.length;
-      for (i = n; i--;) {
+      let i; let j; let k; let k2; let h; let d; let c; let s; let ik; let dx; let dy;
+      const n = re.length;
+      for (i = n; i>= 0; i--) {
         j = this.fft.twiddle[i];
         this.fft.reI[i] = re[j];
         this.fft.imI[i] = -im[j];

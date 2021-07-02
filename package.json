@@ -29,7 +29,8 @@
     "uglify-js": "^2.4.23"
   },
   "scripts": {
-    "test": "istanbul cover _mocha -- --compilers js:babel/register --recursive build/test"
+    "test": "istanbul cover _mocha -- --compilers js:babel/register --recursive build/test",
+    "test-no-coverage": "mocha build/test/*"
   },
   "browserify": {
     "transform": [

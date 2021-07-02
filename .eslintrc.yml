@@ -11,4 +11,7 @@ parserOptions:
 plugins:
   - '@typescript-eslint'
 root: true
-rules: {}
+rules: {
+  "require-jsdoc": "off",
+  "max-len": "off"
+}
